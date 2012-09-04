@@ -9,6 +9,7 @@ import scala.collection.mutable.{ HashMap, HashSet }
 import com.klout.akkamemcache.Protocol._
 import scala.collection.JavaConversions._
 import scala.util.Random
+import akka.routing._
 /**
  * This actor instantiates the pool of MemcachedIOActors and routes requests
  * from the MemcachedClient to the IOActors.
@@ -18,7 +19,7 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
     /**
      * Maps memcached servers to a pool of IOActors, one for each connection.
      */
-    val ioActors: HashMap[String, List[ActorRef]] = new HashMap()
+    val ioActorMap: HashMap[String, ActorRef] = new HashMap()
 
     /**
      * RequestMap maps actors to the results that the actor has recieved from memcached.
@@ -62,14 +63,18 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
      * of actors. Each IoActor owns one connection to the server.
      */
     override def preStart {
-        ioActors ++=
+        ioActorMap ++=
             hosts.map {
                 case (host, port) =>
-                    (host, (1 to connectionsPerServer).map {
+                    val ioActors = (1 to connectionsPerServer).map {
                         num =>
                             context.actorOf(Props(new MemcachedIOActor(host, port, self)),
                                 name = "Memcached_IO_Actor_for_" + host + "_" + num)
-                    }.toList)
+                    }.toList
+                    val router = context.actorOf(Props(new MemcachedIOActor(host, port, self)).withRouter(RoundRobinRouter(routees = ioActors)),
+                        name = "Memcached_IO_Actor_Router_for" + host)
+                    (host, router)
+
             }
     }
 
@@ -79,11 +84,7 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
      */
     def forwardCommand(command: Command) = {
         command.consistentSplit(hosts) foreach {
-            case ((host, port), command) => {
-                // Send the command to a random connection on the appropriate server
-                val ioActor = ioActors(host)(Random.nextInt(connectionsPerServer))
-                ioActor ! command
-            }
+            case ((host, port), command) => ioActorMap(host) ! command
         }
     }
 
