@@ -81,7 +81,7 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
                                 name = "Memcached_IO_Actor_for_" + host + "_" + num)
                     }.toList
                     val router = context.actorOf(Props(new MemcachedIOActor(host, port, self)).withRouter(RoundRobinRouter(routees = ioActors)),
-                        name = "Memcached_IO_Actor_Router_for" + host)
+                        name = "Memcached_IO_Actor_Router_for_" + host)
                     (host, router)
 
             }

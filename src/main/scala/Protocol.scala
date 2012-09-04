@@ -96,6 +96,8 @@ object Constants {
 
     val CRLF = ByteString("\r\n")
 
+    val CRLFString = "\r\n"
+
     val Value = ByteString("VALUE")
 
     val End = ByteString("END")
@@ -121,28 +123,55 @@ object Protocol {
         def toByteString: ByteString
     }
 
+    /**
+     * This command instructs Memcached to set multiple key-value pairs with a given ttl
+     */
     case class SetCommand(keyValueMap: Map[String, ByteString], ttl: Long) extends Command {
+        /**
+         * Creates one memcached "set" instruction for each key-value pair, and concatenates the instructions
+         * to be sent to the memcached server
+         */
         override def toByteString = {
-            keyValueMap.map {
+            val instructions = keyValueMap.map {
                 case (key, value) =>
-                    if (key.size == 0) throw new RuntimeException("A key is required")
-                    if (!(key intersect whitespace).isEmpty)
-                        throw new RuntimeException("Keys cannot have whitespace")
+                    if (key.isEmpty) throw new RuntimeException("An empty string is not a valid key")
+                    if (!(key intersect whitespace).isEmpty) throw new RuntimeException("Keys cannot have whitespace")
+
+                    /* Single set instruction */
                     ByteString("set " + key + " 0 " + ttl + " " + value.size + " noreply") ++ CRLF ++ value ++ CRLF
-            }.foldLeft(ByteString())(_ ++ _)
+            }
+
+            /* Concatenated instructions */
+            instructions.foldLeft(ByteString())(_ ++ _)
         }
     }
 
+    /**
+     * This commands instructs Memcached to delete one or more keys
+     */
     case class DeleteCommand(keys: String*) extends Command {
+        /**
+         * Creates on memcached "delete" instruction for each key, and concatenates the instructions
+         * to be sent to the memcached server
+         */
         override def toByteString = {
-            val command = keys.map {
-                "delete " + _ + " noreply" + "\r\n"
-            } mkString ""
-            ByteString(command)
+            val instructions = keys.map {
+                /* Single delete instruction */
+                "delete " + _ + " noreply" + CRLFString
+            }
+
+            /* Concatenated instructions */
+            ByteString(instructions mkString "")
         }
     }
 
+    /**
+     * This command instructs Memcached to get the value for one or more keys
+     */
     case class GetCommand(keys: Set[String]) extends Command {
+        /**
+         * Creates a single Memcached multiget instruction to get all of the keys
+         */
         override def toByteString = {
             if (keys.size > 0) ByteString("get " + (keys mkString " ")) ++ CRLF
             else ByteString()

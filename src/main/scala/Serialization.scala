@@ -7,10 +7,6 @@ import java.io.Closeable
 import java.io.IOException
 import java.util.Calendar
 
-trait Serializer[T] {
-    def serialize(t: T): ByteString
-}
-
 object `package` {
 
     def using[C <: Closeable, V](closeables: C*)(f: () => V): V = {
@@ -26,11 +22,8 @@ object `package` {
     }
 }
 
-object Serializer {
-
-    def serialize[T: Serializer](t: T): ByteString = implicitly[Serializer[T]] serialize t
-
-    implicit def any[T] = new Serializer[T] {
+object Serialization {
+    implicit def JBoss[T <: Any] = new SerializerWithDeserializer[T] {
         def serialize(o: T): ByteString = {
             Option(o) match {
                 case None => throw new NullPointerException("Can't serialize null")
@@ -53,16 +46,6 @@ object Serializer {
                     }
             }
         }
-    }
-}
-
-trait Deserializer[T] {
-    def deserialize(bytes: ByteString): T
-}
-
-object Deserializer {
-
-    implicit def any[T] = new Deserializer[T] {
         def deserialize(in: ByteString): T = {
             val bis = new ByteArrayInputStream(in.iterator.toArray)
             val is = new JBossObjectInputStream(bis)
@@ -72,6 +55,22 @@ object Deserializer {
             obj.asInstanceOf[T]
         }
     }
+}
 
+trait Serializer[T] {
+    def serialize(t: T): ByteString
+}
+
+object Serializer {
+    def serialize[T: Serializer](t: T): ByteString = implicitly[Serializer[T]] serialize t
+}
+
+trait Deserializer[T] {
+    def deserialize(bytes: ByteString): T
+}
+
+object Deserializer {
     def deserialize[T: Deserializer](bytes: ByteString): T = implicitly[Deserializer[T]] deserialize bytes
 }
+
+trait SerializerWithDeserializer[T] extends Serializer[T] with Deserializer[T]

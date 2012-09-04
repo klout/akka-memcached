@@ -56,6 +56,7 @@ class JbossSerializingTranscoder extends SerializingTranscoder {
 }
 
 object PerformanceTest {
+    implicit def serializer[T] = Serialization.JBoss[T]
 
     val bigMapAkka = (1 to 1000).map(num => "Akka" + num.toString -> ("String #" + num)) toMap
     val bigListAkka = (1 to 1000).map("Akka String #" + _)

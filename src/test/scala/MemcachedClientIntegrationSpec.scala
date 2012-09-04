@@ -13,9 +13,11 @@ case class TestClass(@BeanProperty test1: String,
 
 class MemcachedClientIntegrationSpec extends Specification with PendingUntilFixed {
 
-    val client = new RealMemcachedClient(List(("search1", 11211), ("search2", 11211)), 1)
+    val client = new RealMemcachedClient(List(("localhost", 11211)), 1)
     val noTTL = Duration("0 seconds")
     val timeout = Duration("5 seconds")
+
+    implicit def serializer[T] = Serialization.JBoss[T]
 
     sequential
     "The memcached client" should {

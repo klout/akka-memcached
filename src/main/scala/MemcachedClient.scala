@@ -9,7 +9,6 @@ import akka.util.Timeout
 import akka.util.ByteString
 
 import com.klout.akkamemcache.Protocol._
-
 /**
  * Asynchronous memcached client.
  */
