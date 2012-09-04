@@ -10,6 +10,15 @@ import com.klout.akkamemcache.Protocol._
 import scala.collection.JavaConversions._
 import scala.util.Random
 import akka.routing._
+import ActorTypes._
+import com.google.common.hash.Hashing._
+
+object ActorTypes {
+    type RequestorActorRef = ActorRef
+    type IoActorRouterRef = ActorRef
+    type PoolActorRef = ActorRef
+}
+
 /**
  * This actor instantiates the pool of MemcachedIOActors and routes requests
  * from the MemcachedClient to the IOActors.
@@ -19,12 +28,12 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
     /**
      * Maps memcached servers to a pool of IOActors, one for each connection.
      */
-    val ioActorMap: HashMap[String, ActorRef] = new HashMap()
+    val ioActorMap: HashMap[String, IoActorRouterRef] = new HashMap()
 
     /**
-     * RequestMap maps actors to the results that the actor has recieved from memcached.
+     * RequestMap maps requesting IoActors to the results that the actor has recieved from memcached.
      */
-    val requestMap: HashMap[ActorRef, HashMap[String, Option[GetResult]]] = new HashMap()
+    val requestMap: HashMap[RequestorActorRef, HashMap[String, Option[GetResult]]] = new HashMap()
 
     /**
      * Updates the requestMap to add the result from Memcached to any actor
@@ -83,7 +92,30 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
      * appropriate IoActors.
      */
     def forwardCommand(command: Command) = {
-        command.consistentSplit(hosts) foreach {
+        val hostCommandMap = command match {
+            case SetCommand(keyValueMap, ttl) => {
+                val splitKeyValues = keyValueMap.groupBy{
+                    case (key, value) => hosts(consistentHash(key.hashCode, hosts.size))
+                }
+                splitKeyValues.map{
+                    case (host, keyValueMap) => (host, SetCommand(keyValueMap, ttl))
+                }
+            }
+            case GetCommand(keys) => {
+                val splitKeys = keys.groupBy(key => hosts(consistentHash(key.hashCode, hosts.size)))
+                splitKeys.map{
+                    case (host, keys) => (host, GetCommand(keys))
+                }
+            }
+            case command: DeleteCommand => {
+                val splitKeys = command.keys.groupBy(key => hosts(consistentHash(key.hashCode, hosts.size)))
+                splitKeys.map{
+                    case (host, keys) => (host, DeleteCommand(keys: _*))
+                }
+            }
+        }
+
+        hostCommandMap foreach {
             case ((host, port), command) => ioActorMap(host) ! command
         }
     }
@@ -111,7 +143,7 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
             updateRequestMap(result)
             sendResponses()
         }
-        case results: Set[GetResult] => {
+        case GetResults(results) => {
             results foreach updateRequestMap
             sendResponses()
         }
@@ -120,16 +152,20 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
 
 /**
  * This actor is responsible for all communication to and from a single memcached server
- * using a single conneciton.
+ * using a single connection.
  */
-class MemcachedIOActor(host: String, port: Int, poolActor: ActorRef) extends Actor {
+class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends Actor {
     var connection: IO.SocketHandle = _
 
-    /* Contains the pending results for a Memcache multiget that is currently
-     * in progress */
+    /**
+     * Contains the pending results for a Memcache multiget that is currently
+     * in progress
+     */
     val currentSet: HashSet[String] = new HashSet()
 
-    /* Contains the pending results for the next Memcached multiget */
+    /**
+     * Contains the pending results for the next Memcached multiget
+     */
     val nextSet: HashSet[String] = new HashSet()
 
     /**
@@ -170,7 +206,7 @@ class MemcachedIOActor(host: String, port: Int, poolActor: ActorRef) extends Act
      */
     def getCommandCompleted() {
         awaitingResponseFromMemcached = false
-        poolActor ! currentSet.map(NotFound).toSet
+        poolActor ! GetResults(currentSet.map(NotFound).toSet)
         currentSet --= currentSet
         currentSet ++= nextSet
         nextSet --= nextSet
@@ -227,13 +263,21 @@ class MemcachedIOActor(host: String, port: Int, poolActor: ActorRef) extends Act
 
 }
 
-/* Stores the result of a Memcached Get */
+/**
+ * Stores the result of a Memcached Get
+ */
 sealed trait GetResult {
     def key: String
 }
 
-/* Cache hit */
+case class GetResults(results: Set[GetResult])
+
+/**
+ * Cache Hit
+ */
 case class Found(key: String, value: ByteString) extends GetResult
 
-/* Cache miss */
+/**
+ * Cache Miss
+ */
 case class NotFound(key: String) extends GetResult
