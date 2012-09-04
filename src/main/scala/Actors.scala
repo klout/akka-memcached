@@ -13,27 +13,24 @@ import scala.util.Random
  * This actor instantiates the pool of MemcachedIOActors and routes requests
  * from the MemcachedClient to the IOActors.
  */
-class PoolActor(hosts: List[(String, Int)]) extends Actor {
-
-    val connectionsPerServer = 3
+class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends Actor {
 
     /**
-     * This is a mapping from hosts to actors. Each host has one actor for each connection
-     * to it
+     * Maps memcached servers to a pool of IOActors, one for each connection.
      */
-    var ioActors: HashMap[String, List[ActorRef]] = _
+    val ioActors: HashMap[String, List[ActorRef]] = new HashMap()
 
     /**
      * RequestMap maps actors to the results that the actor has recieved from memcached.
      */
-    var requestMap: HashMap[ActorRef, HashMap[String, Option[GetResult]]] = new HashMap()
+    val requestMap: HashMap[ActorRef, HashMap[String, Option[GetResult]]] = new HashMap()
 
     /**
      * Updates the requestMap to add the result from Memcached to any actor
      * that requested it.
      */
     def updateRequestMap(result: GetResult) = {
-        requestMap = requestMap map {
+        requestMap ++= requestMap map {
             case (actor, resultMap) => {
                 val newResultMap = resultMap map {
                     case (key, resultOption) if key == result.key => (key, Some(result))
@@ -65,7 +62,7 @@ class PoolActor(hosts: List[(String, Int)]) extends Actor {
      * of actors. Each IoActor owns one connection to the server.
      */
     override def preStart {
-        ioActors = HashMap{
+        ioActors ++=
             hosts.map {
                 case (host, port) =>
                     (host, (1 to connectionsPerServer).map {
@@ -73,8 +70,7 @@ class PoolActor(hosts: List[(String, Int)]) extends Actor {
                             context.actorOf(Props(new MemcachedIOActor(host, port, self)),
                                 name = "Memcached_IO_Actor_for_" + host + "_" + num)
                     }.toList)
-            }: _*
-        }
+            }
     }
 
     /**
@@ -93,10 +89,8 @@ class PoolActor(hosts: List[(String, Int)]) extends Actor {
 
     def receive = {
         /**
-         * For GetCommands, send a reference to the requesting actor to the
-         * IoActor so that the MemcachedIoActor can return the result directly
-         * to the requester. Because SetCommands and DeleteCommands are fire-and-forget,
-         * the MemcachedIoActor does not need to know the sender.
+         * For GetCommands, this will save the requester to the requestMap so the
+         * result can be returned to the requester.
          */
         case command @ GetCommand(keys) =>
             val keyResultMap = keys.map {
@@ -105,12 +99,12 @@ class PoolActor(hosts: List[(String, Int)]) extends Actor {
             requestMap += ((sender, HashMap(keyResultMap: _*)))
             forwardCommand(command)
 
-        /* Route a SetCommand or GetCommand to the correct IoActor */
+        /* Route a SetCommand or DeleteCommand to the correct IoActor */
         case command: Command => forwardCommand(command)
 
         /**
          * Update the requestMap for any actors that were requesting this result, and
-         * send responses to the actors if any actors request has been fulfilled.
+         * send responses to the actors if their request has been fulfilled.
          */
         case result: GetResult => {
             updateRequestMap(result)
@@ -132,10 +126,10 @@ class MemcachedIOActor(host: String, port: Int, poolActor: ActorRef) extends Act
 
     /* Contains the pending results for a Memcache multiget that is currently
      * in progress */
-    var currentSet: HashSet[String] = new HashSet()
+    val currentSet: HashSet[String] = new HashSet()
 
     /* Contains the pending results for the next Memcached multiget */
-    var nextSet: HashSet[String] = new HashSet()
+    val nextSet: HashSet[String] = new HashSet()
 
     /**
      * Opens a single connection to the Memcached server
@@ -176,8 +170,9 @@ class MemcachedIOActor(host: String, port: Int, poolActor: ActorRef) extends Act
     def getCommandCompleted() {
         awaitingResponseFromMemcached = false
         poolActor ! currentSet.map(NotFound).toSet
-        currentSet = nextSet
-        nextSet = HashSet.empty
+        currentSet --= currentSet
+        currentSet ++= nextSet
+        nextSet --= nextSet
         writeGetCommandToMemcachedIfPossible()
     }
 

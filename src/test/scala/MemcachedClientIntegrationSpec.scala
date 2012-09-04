@@ -13,7 +13,7 @@ case class TestClass(@BeanProperty test1: String,
 
 class MemcachedClientIntegrationSpec extends Specification with PendingUntilFixed {
 
-    val client = new RealMemcachedClient(List(("localhost", 11211)))
+    val client = new RealMemcachedClient(List(("localhost", 11211)), 1)
     val noTTL = Duration("0 seconds")
     val timeout = Duration("5 seconds")
 

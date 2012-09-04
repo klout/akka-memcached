@@ -10,31 +10,46 @@ import akka.util.ByteString
 
 import com.klout.akkamemcache.Protocol._
 
+/**
+ * Asynchronous memcached client.
+ */
 trait MemcachedClient {
 
-    val DefaultDuration = 1 hour
+    val DefaultTTL = 1 hour
 
-    def set[T: Serializer](key: String, value: T, ttl: Duration = DefaultDuration): Unit
+    /**
+     * Sets a single key - Fire and Forget
+     */
+    def set[T: Serializer](key: String, value: T, ttl: Duration = DefaultTTL): Unit
 
-    def mset[T: Serializer](values: Map[String, T], ttl: Duration = DefaultDuration): Unit
+    /**
+     * Sets multiple key-value pairs, all with the same TTL - Fire and Forget
+     */
+    def mset[T: Serializer](values: Map[String, T], ttl: Duration = DefaultTTL): Unit
 
+    /**
+     * Retrieves the value of a single key
+     */
     def get[T: Deserializer](key: String): Future[Option[T]]
 
+    /**
+     * Retrieves the values of multiple keys
+     */
     def mget[T: Deserializer](keys: Set[String]): Future[Map[String, T]]
 
+    /**
+     * Deletes multiple keys - Fire and Forget
+     */
     def delete(keys: String*): Unit
 
 }
 
-/**
- * Asynchronous memcached client.
- */
-class RealMemcachedClient(hosts: List[(String, Int)]) extends MemcachedClient {
+class RealMemcachedClient(hosts: List[(String, Int)], connectionsPerServer: Int = 1) extends MemcachedClient {
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     val system = ActorSystem()
 
-    val poolActor = system.actorOf(Props(new PoolActor(hosts)), name = "PoolActor")
+    val poolActor = system.actorOf(Props(new PoolActor(hosts, connectionsPerServer)), name = "PoolActor")
 
     override def set[T: Serializer](key: String, value: T, ttl: Duration) {
         mset(Map(key -> value), ttl)
