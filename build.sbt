@@ -3,7 +3,7 @@ import scalariform.formatter.preferences._
 
 name := "akka-memcached"
 
-version := "0.1"
+version := "0.24"
 
 scalaVersion := "2.9.1"
 
@@ -11,7 +11,7 @@ libraryDependencies ++= Seq(
  	"log4j" % "log4j" % "1.2.14",
 	"jboss" % "jboss-serialization" % "1.0.3.GA",
 	"trove" % "trove" % "1.0.2",
-	"com.typesafe.akka" % "akka-actor" % "2.0.3",
+	//"com.typesafe.akka" % "akka-actor" % "2.0.3", Typesafe repo is down
   	"org.specs2" %% "specs2" % "1.12.1" % "test",
     "com.google.code.simple-spring-memcached" % "spymemcached" % "2.8.1",
     "junit" % "junit" % "4.10",

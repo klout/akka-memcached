@@ -1,0 +1,1274 @@
+Search1
+
+➜  ~  ab -A klout:pimpmyride -n 200 -c 50 http://load-api1:9000/testGetAkkaMemcached
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking load-api1 (be patient)
+Completed 100 requests
+Completed 200 requests
+Finished 200 requests
+
+
+Server Software:        
+Server Hostname:        load-api1
+Server Port:            9000
+
+Document Path:          /testGetAkkaMemcached
+Document Length:        48501 bytes
+
+Concurrency Level:      50
+Time taken for tests:   7.322 seconds
+Complete requests:      200
+Failed requests:        0
+Write errors:           0
+Total transferred:      9718000 bytes
+HTML transferred:       9700200 bytes
+Requests per second:    27.31 [#/sec] (mean)
+Time per request:       1830.560 [ms] (mean)
+Time per request:       36.611 [ms] (mean, across all concurrent requests)
+Transfer rate:          1296.08 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       11   68  68.7     33     345
+Processing:   313 1629 604.6   1479    2709
+Waiting:      259 1357 605.4   1269    2584
+Total:        535 1697 563.3   1530    2736
+
+Percentage of the requests served within a certain time (ms)
+  50%   1530
+  66%   1980
+  75%   2039
+  80%   2307
+  90%   2649
+  95%   2708
+  98%   2727
+  99%   2735
+ 100%   2736 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 200 -c 50 http://load-api1:9000/testGetSpyMemcached
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking load-api1 (be patient)
+Completed 100 requests
+Completed 200 requests
+Finished 200 requests
+
+
+Server Software:        
+Server Hostname:        load-api1
+Server Port:            9000
+
+Document Path:          /testGetSpyMemcached
+Document Length:        46501 bytes
+
+Concurrency Level:      50
+Time taken for tests:   11.914 seconds
+Complete requests:      200
+Failed requests:        28
+   (Connect: 0, Receive: 0, Length: 28, Exceptions: 0)
+Write errors:           0
+Non-2xx responses:      28
+Total transferred:      8015076 bytes
+HTML transferred:       7998172 bytes
+Requests per second:    16.79 [#/sec] (mean)
+Time per request:       2978.413 [ms] (mean)
+Time per request:       59.568 [ms] (mean, across all concurrent requests)
+Transfer rate:          657.00 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       11   72  55.0     60     280
+Processing:   385 2480 1494.9   2281    7336
+Waiting:      264 1863 933.7   1891    4305
+Total:        396 2552 1519.1   2323    7466
+
+Percentage of the requests served within a certain time (ms)
+  50%   2323
+  66%   2766
+  75%   3197
+  80%   3521
+  90%   4910
+  95%   5866
+  98%   6465
+  99%   6788
+ 100%   7466 (longest request)
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+ Search1 and Search2
+
+ ➜  ~  ab -A klout:pimpmyride -n 200 -c 50 http://load-api1:9000/testGetAkkaMemcached
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking load-api1 (be patient)
+Completed 100 requests
+Completed 200 requests
+Finished 200 requests
+
+
+Server Software:        
+Server Hostname:        load-api1
+Server Port:            9000
+
+Document Path:          /testGetAkkaMemcached
+Document Length:        48501 bytes
+
+Concurrency Level:      50
+Time taken for tests:   13.431 seconds
+Complete requests:      200
+Failed requests:        0
+Write errors:           0
+Total transferred:      9718000 bytes
+HTML transferred:       9700200 bytes
+Requests per second:    14.89 [#/sec] (mean)
+Time per request:       3357.853 [ms] (mean)
+Time per request:       67.157 [ms] (mean, across all concurrent requests)
+Transfer rate:          706.57 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       36  309 184.1    378     909
+Processing:   370 2281 1485.0   1622    6891
+Waiting:      266  949 526.6    739    2381
+Total:        417 2590 1396.7   2097    7149
+
+Percentage of the requests served within a certain time (ms)
+  50%   2097
+  66%   2335
+  75%   3325
+  80%   3776
+  90%   4768
+  95%   5227
+  98%   6748
+  99%   7125
+ 100%   7149 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 200 -c 50 http://load-api1:9000/testGetSpyMemcached 
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking load-api1 (be patient)
+Completed 100 requests
+Completed 200 requests
+Finished 200 requests
+
+
+Server Software:        
+Server Hostname:        load-api1
+Server Port:            9000
+
+Document Path:          /testGetSpyMemcached
+Document Length:        46501 bytes
+
+Concurrency Level:      50
+Time taken for tests:   16.100 seconds
+Complete requests:      200
+Failed requests:        9
+   (Connect: 0, Receive: 0, Length: 9, Exceptions: 0)
+Write errors:           0
+Non-2xx responses:      9
+Total transferred:      8899203 bytes
+HTML transferred:       8881691 bytes
+Requests per second:    12.42 [#/sec] (mean)
+Time per request:       4025.084 [ms] (mean)
+Time per request:       80.502 [ms] (mean, across all concurrent requests)
+Transfer rate:          539.78 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       12  389 400.0    223    1219
+Processing:   719 3453 1604.9   3233   10230
+Waiting:      197 1757 876.1   1541    4148
+Total:        731 3842 1617.5   3904   10495
+
+Percentage of the requests served within a certain time (ms)
+  50%   3904
+  66%   4198
+  75%   4473
+  80%   4657
+  90%   5650
+  95%   7224
+  98%   7872
+  99%  10314
+ 100%  10495 (longest request)
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+Localhost Memcached
+➜  api2 git:(zg-akkamemcache) ✗ ab -A klout:pimpmyride -n 1200 -c 50 http://localhost:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 120 requests
+Completed 240 requests
+Completed 360 requests
+Completed 480 requests
+Completed 600 requests
+Completed 720 requests
+Completed 840 requests
+Completed 960 requests
+Completed 1080 requests
+Completed 1200 requests
+Finished 1200 requests
+
+
+Server Software:        
+Server Hostname:        localhost
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      50
+Time taken for tests:   1.485 seconds
+Complete requests:      1200
+Failed requests:        0
+Write errors:           0
+Total transferred:      1071600 bytes
+HTML transferred:       967200 bytes
+Requests per second:    808.11 [#/sec] (mean)
+Time per request:       61.873 [ms] (mean)
+Time per request:       1.237 [ms] (mean, across all concurrent requests)
+Transfer rate:          704.73 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.5      0       9
+Processing:     9   61  27.1     57     162
+Waiting:        9   61  27.1     57     162
+Total:          9   61  27.1     57     162
+
+Percentage of the requests served within a certain time (ms)
+  50%     57
+  66%     69
+  75%     76
+  80%     82
+  90%    100
+  95%    113
+  98%    131
+  99%    149
+ 100%    162 (longest request)
+
+Localhost Memcached
+➜  api2 git:(zg-akkamemcache) ✗ ab -A klout:pimpmyride -n 1200 -c 50 http://localhost:9000/user.json/103083/score                     
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 120 requests
+Completed 240 requests
+Completed 360 requests
+Completed 480 requests
+Completed 600 requests
+Completed 720 requests
+Completed 840 requests
+Completed 960 requests
+Completed 1080 requests
+Completed 1200 requests
+Finished 1200 requests
+
+
+Server Software:        
+Server Hostname:        localhost
+Server Port:            9000
+
+Document Path:          /user.json/103083/score
+Document Length:        806 bytes
+
+Concurrency Level:      50
+Time taken for tests:   1.236 seconds
+Complete requests:      1200
+Failed requests:        0
+Write errors:           0
+Total transferred:      1071600 bytes
+HTML transferred:       967200 bytes
+Requests per second:    971.19 [#/sec] (mean)
+Time per request:       51.483 [ms] (mean)
+Time per request:       1.030 [ms] (mean, across all concurrent requests)
+Transfer rate:          846.95 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.3      0       3
+Processing:    12   50  26.8     45     168
+Waiting:       12   50  26.7     45     168
+Total:         12   51  26.8     45     168
+
+Percentage of the requests served within a certain time (ms)
+  50%     45
+  66%     56
+  75%     64
+  80%     70
+  90%     85
+  95%    110
+  98%    127
+  99%    139
+ 100%    168 (longest request)
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+5 connections / server on search1, search2
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   17.296 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    144.54 [#/sec] (mean)
+Time per request:       553.469 [ms] (mean)
+Time per request:       6.918 [ms] (mean, across all concurrent requests)
+Transfer rate:          126.05 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        8   72 199.9     25    2038
+Processing:    69  476 184.0    440    1358
+Waiting:       69  475 183.4    439    1358
+Total:        186  548 246.1    481    2217
+
+Percentage of the requests served within a certain time (ms)
+  50%    481
+  66%    538
+  75%    602
+  80%    649
+  90%    800
+  95%   1048
+  98%   1240
+  99%   1629
+ 100%   2217 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score          This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   15.041 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    166.21 [#/sec] (mean)
+Time per request:       481.306 [ms] (mean)
+Time per request:       6.016 [ms] (mean, across all concurrent requests)
+Transfer rate:          144.95 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        9   99 254.6     25    2184
+Processing:    44  375 160.0    350    1349
+Waiting:       44  374 159.7    350    1349
+Total:         68  474 293.0    399    2855
+
+Percentage of the requests served within a certain time (ms)
+  50%    399
+  66%    461
+  75%    512
+  80%    551
+  90%    783
+  95%    932
+  98%   1387
+  99%   1829
+ 100%   2855 (longest request)
+
+ -----------------------------------------------------------------------------------------------------------------
+1 connection per server
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   12.895 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    193.87 [#/sec] (mean)
+Time per request:       412.648 [ms] (mean)
+Time per request:       5.158 [ms] (mean, across all concurrent requests)
+Transfer rate:          169.07 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       10   62 129.6     30    1230
+Processing:    82  341 164.0    305    1150
+Waiting:       82  341 163.9    303    1150
+Total:        115  403 193.2    346    1671
+
+Percentage of the requests served within a certain time (ms)
+  50%    346
+  66%    395
+  75%    438
+  80%    461
+  90%    572
+  95%    867
+  98%   1046
+  99%   1095
+ 100%   1671 (longest request)
+----------------------------------------------------------------------------------------------------------
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score          This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   14.191 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    176.17 [#/sec] (mean)
+Time per request:       454.115 [ms] (mean)
+Time per request:       5.676 [ms] (mean, across all concurrent requests)
+Transfer rate:          153.63 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        9  109 262.3     34    2237
+Processing:    61  341 166.9    309    1246
+Waiting:       61  341 166.9    308    1246
+Total:         90  450 301.6    360    2705
+
+Percentage of the requests served within a certain time (ms)
+  50%    360
+  66%    413
+  75%    473
+  80%    519
+  90%    765
+  95%    937
+  98%   1487
+  99%   1776
+ 100%   2705 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   12.606 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    198.32 [#/sec] (mean)
+Time per request:       403.380 [ms] (mean)
+Time per request:       5.042 [ms] (mean, across all concurrent requests)
+Transfer rate:          172.95 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       10   99 190.2     50    1569
+Processing:    50  302 166.4    261    1162
+Waiting:       50  302 166.4    261    1162
+Total:        103  401 238.5    337    1998
+
+Percentage of the requests served within a certain time (ms)
+  50%    337
+  66%    389
+  75%    428
+  80%    470
+  90%    663
+  95%    793
+  98%   1188
+  99%   1550
+ 100%   1998 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   10.516 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    237.74 [#/sec] (mean)
+Time per request:       336.501 [ms] (mean)
+Time per request:       4.206 [ms] (mean, across all concurrent requests)
+Transfer rate:          207.33 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        9   80 133.3     47    1279
+Processing:    53  253  87.5    243     637
+Waiting:       53  252  87.3    243     637
+Total:         70  332 146.2    315    1568
+
+Percentage of the requests served within a certain time (ms)
+  50%    315
+  66%    355
+  75%    380
+  80%    398
+  90%    441
+  95%    500
+  98%    555
+  99%   1383
+ 100%   1568 (longest request)
+---------------------------------------------------------------------------------------------------------------------------------
+3 simultaneous connections
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   11.764 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    212.51 [#/sec] (mean)
+Time per request:       376.452 [ms] (mean)
+Time per request:       4.706 [ms] (mean, across all concurrent requests)
+Transfer rate:          185.32 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        9   60 129.3     36    1231
+Processing:    77  310 109.8    297     772
+Waiting:       77  309 109.7    297     772
+Total:        145  370 152.2    342    1550
+
+Percentage of the requests served within a certain time (ms)
+  50%    342
+  66%    376
+  75%    398
+  80%    416
+  90%    513
+  95%    594
+  98%    692
+  99%   1311
+ 100%   1550 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   13.767 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    181.59 [#/sec] (mean)
+Time per request:       440.555 [ms] (mean)
+Time per request:       5.507 [ms] (mean, across all concurrent requests)
+Transfer rate:          158.36 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        8  119 173.2     75    1345
+Processing:    35  318 147.9    296    1136
+Waiting:       35  317 147.9    295    1136
+Total:         45  436 223.6    389    1907
+
+Percentage of the requests served within a certain time (ms)
+  50%    389
+  66%    437
+  75%    480
+  80%    511
+  90%    585
+  95%    692
+  98%   1321
+  99%   1420
+ 100%   1907 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   12.880 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    194.10 [#/sec] (mean)
+Time per request:       412.155 [ms] (mean)
+Time per request:       5.152 [ms] (mean, across all concurrent requests)
+Transfer rate:          169.27 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       10  126 117.7    114    1232
+Processing:    27  282 124.3    253     787
+Waiting:       27  281 124.1    253     787
+Total:         72  407 168.2    373    1676
+
+Percentage of the requests served within a certain time (ms)
+  50%    373
+  66%    419
+  75%    449
+  80%    471
+  90%    564
+  95%    699
+  98%    816
+  99%    962
+ 100%   1676 (longest request)
+
+---------------------------------------------------------------------------------------
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   16.732 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    149.42 [#/sec] (mean)
+Time per request:       535.419 [ms] (mean)
+Time per request:       6.693 [ms] (mean, across all concurrent requests)
+Transfer rate:          130.30 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        9   61 178.8     23    1718
+Processing:    29  467 229.4    429    1619
+Waiting:       29  467 229.4    429    1619
+Total:         40  528 273.2    468    2322
+
+Percentage of the requests served within a certain time (ms)
+  50%    468
+  66%    513
+  75%    550
+  80%    579
+  90%    669
+  95%   1040
+  98%   1587
+  99%   1638
+ 100%   2322 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   11.413 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    219.04 [#/sec] (mean)
+Time per request:       365.231 [ms] (mean)
+Time per request:       4.565 [ms] (mean, across all concurrent requests)
+Transfer rate:          191.02 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       10   42  90.9     28    1146
+Processing:    27  320  77.4    311     697
+Waiting:       27  319  77.4    310     697
+Total:         47  362 113.2    349    1488
+
+Percentage of the requests served within a certain time (ms)
+  50%    349
+  66%    369
+  75%    384
+  80%    396
+  90%    447
+  95%    514
+  98%    572
+  99%    613
+ 100%   1488 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   14.543 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    171.90 [#/sec] (mean)
+Time per request:       465.390 [ms] (mean)
+Time per request:       5.817 [ms] (mean, across all concurrent requests)
+Transfer rate:          149.91 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       10   73 135.6     30    1199
+Processing:    43  386 181.2    355    1146
+Waiting:       43  385 181.1    354    1146
+Total:         78  458 204.3    416    1787
+
+Percentage of the requests served within a certain time (ms)
+  50%    416
+  66%    471
+  75%    515
+  80%    568
+  90%    718
+  95%    830
+  98%   1027
+  99%   1224
+ 100%   1787 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   11.425 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    218.82 [#/sec] (mean)
+Time per request:       365.599 [ms] (mean)
+Time per request:       4.570 [ms] (mean, across all concurrent requests)
+Transfer rate:          190.83 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       10   68 146.7     32    1165
+Processing:    22  295 126.7    275     883
+Waiting:       22  294 126.8    274     883
+Total:         41  362 189.2    319    1822
+
+Percentage of the requests served within a certain time (ms)
+  50%    319
+  66%    364
+  75%    399
+  80%    430
+  90%    545
+  95%    627
+  98%    809
+  99%   1439
+ 100%   1822 (longest request)
+ -------------------------------------------------------------------------------------------------------------------------------------------
+ More @ 1 connection per host
+ ➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   16.589 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    150.70 [#/sec] (mean)
+Time per request:       530.850 [ms] (mean)
+Time per request:       6.636 [ms] (mean, across all concurrent requests)
+Transfer rate:          131.42 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        9  118 275.1     51    2265
+Processing:    54  409 155.9    394    1021
+Waiting:       54  408 155.7    393    1021
+Total:         83  527 323.6    444    2893
+
+Percentage of the requests served within a certain time (ms)
+  50%    444
+  66%    493
+  75%    532
+  80%    560
+  90%    738
+  95%   1006
+  98%   1713
+  99%   2056
+ 100%   2893 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   10.908 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    229.20 [#/sec] (mean)
+Time per request:       349.043 [ms] (mean)
+Time per request:       4.363 [ms] (mean, across all concurrent requests)
+Transfer rate:          199.88 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       10   57 129.3     29    1272
+Processing:    45  288  91.4    279     624
+Waiting:       45  288  91.2    279     624
+Total:         59  346 150.7    326    1604
+
+Percentage of the requests served within a certain time (ms)
+  50%    326
+  66%    362
+  75%    388
+  80%    408
+  90%    460
+  95%    507
+  98%    575
+  99%   1394
+ 100%   1604 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   11.361 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    220.04 [#/sec] (mean)
+Time per request:       363.566 [ms] (mean)
+Time per request:       4.545 [ms] (mean, across all concurrent requests)
+Transfer rate:          191.89 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        9   80 165.7     35    1339
+Processing:    51  280 131.1    256     936
+Waiting:       51  280 131.1    256     936
+Total:        106  360 192.9    327    1619
+
+Percentage of the requests served within a certain time (ms)
+  50%    327
+  66%    361
+  75%    385
+  80%    406
+  90%    492
+  95%    717
+  98%    967
+  99%   1432
+ 100%   1619 (longest request)
+➜  ~  ab -A klout:pimpmyride -n 2500 -c 80 http://staging-api2:9000/user.json/103083/score\?requestId\=akkaCache
+This is ApacheBench, Version 2.3 <$Revision: 1178079 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking staging-api2 (be patient)
+Completed 250 requests
+Completed 500 requests
+Completed 750 requests
+Completed 1000 requests
+Completed 1250 requests
+Completed 1500 requests
+Completed 1750 requests
+Completed 2000 requests
+Completed 2250 requests
+Completed 2500 requests
+Finished 2500 requests
+
+
+Server Software:        
+Server Hostname:        staging-api2
+Server Port:            9000
+
+Document Path:          /user.json/103083/score?requestId=akkaCache
+Document Length:        806 bytes
+
+Concurrency Level:      80
+Time taken for tests:   11.435 seconds
+Complete requests:      2500
+Failed requests:        0
+Write errors:           0
+Total transferred:      2232500 bytes
+HTML transferred:       2015000 bytes
+Requests per second:    218.62 [#/sec] (mean)
+Time per request:       365.924 [ms] (mean)
+Time per request:       4.574 [ms] (mean, across all concurrent requests)
+Transfer rate:          190.66 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        8   74 137.2     39    1233
+Processing:    51  288 127.5    265     937
+Waiting:       51  288 127.5    265     937
+Total:         64  362 181.4    318    1552
+
+Percentage of the requests served within a certain time (ms)
+  50%    318
+  66%    358
+  75%    388
+  80%    409
+  90%    513
+  95%    709
+  98%    855
+  99%   1418
+ 100%   1552 (longest request)
+
+
+
+
+
+
+
+
+

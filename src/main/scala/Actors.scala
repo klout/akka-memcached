@@ -12,6 +12,8 @@ import scala.util.Random
 import akka.routing._
 import ActorTypes._
 import com.google.common.hash.Hashing._
+import java.io._
+import akka.event.Logging
 
 object ActorTypes {
     type RequestorActorRef = ActorRef
@@ -155,6 +157,8 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
  * using a single connection.
  */
 class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends Actor {
+
+    val log = Logging(context.system, this)
     var connection: IO.SocketHandle = _
 
     /**
@@ -173,6 +177,7 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
      */
     override def preStart {
         connection = IOManager(context.system) connect new InetSocketAddress(host, port)
+        log.debug("IoActor starting on " + host + ":" + port)
     }
 
     /**
@@ -181,8 +186,17 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
      * current request is completed
      */
     def enqueueCommand(keys: Set[String]) {
-        val set = if (awaitingResponseFromMemcached) nextSet else currentSet
-        set ++= keys
+        /* Remove duplicate keys */
+        val newKeys = keys diff (nextSet ++ currentSet)
+        val (set, otherSet) = if (awaitingResponseFromMemcached) (nextSet, currentSet) else (currentSet, nextSet)
+
+        val numDeduplicatedFromSet = (keys intersect set).size
+        val numDeduplicatedFromOtherSet = (keys intersect otherSet).size
+        log.debug("Dedup " + numDeduplicatedFromSet + " from set with size " + set.size)
+        log.debug("Dedup " + numDeduplicatedFromOtherSet + " from otherSet with size " + otherSet.size)
+
+        set ++= newKeys
+
     }
 
     /**
