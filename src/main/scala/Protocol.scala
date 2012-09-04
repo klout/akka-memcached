@@ -52,6 +52,11 @@ class Iteratees(ioActor: ActorRef) {
 
     /**
      * Processes a cache hit from Memcached
+     * Each item sent by the server looks like this:
+     *
+     * VALUE <key> <flags> <bytes>\r\n
+     * <data block>\r\n
+     *
      */
     val processValue = {
         for {
@@ -129,7 +134,10 @@ object Protocol {
     case class SetCommand(keyValueMap: Map[String, ByteString], ttl: Long) extends Command {
         /**
          * Creates one memcached "set" instruction for each key-value pair, and concatenates the instructions
-         * to be sent to the memcached server
+         * to be sent to the memcached server.
+         *
+         * A set instruction looks like:
+         * set <key> <flags> <exptime> <bytes> [noreply]\r\n
          */
         override def toByteString = {
             val instructions = keyValueMap.map {
@@ -152,7 +160,10 @@ object Protocol {
     case class DeleteCommand(keys: String*) extends Command {
         /**
          * Creates on memcached "delete" instruction for each key, and concatenates the instructions
-         * to be sent to the memcached server
+         * to be sent to the memcached server.
+         *
+         * A delete instruction looks like:
+         * delete <key> [noreply]\r\n
          */
         override def toByteString = {
             val instructions = keys.map {
@@ -171,6 +182,9 @@ object Protocol {
     case class GetCommand(keys: Set[String]) extends Command {
         /**
          * Creates a single Memcached multiget instruction to get all of the keys
+         *
+         * A get instruction looks like:
+         * get <key>*\r\n
          */
         override def toByteString = {
             if (keys.size > 0) ByteString("get " + (keys mkString " ")) ++ CRLF

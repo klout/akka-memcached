@@ -7,6 +7,7 @@ import akka.util.Duration
 import akka.dispatch.Await
 import scala.reflect.BeanProperty
 import com.klout.akkamemcache._
+import Serialization.JBoss
 
 case class TestClass(@BeanProperty test1: String,
                      @BeanProperty test2: Map[String, Int])
@@ -16,8 +17,6 @@ class MemcachedClientIntegrationSpec extends Specification with PendingUntilFixe
     val client = new RealMemcachedClient(List(("localhost", 11211)), 1)
     val noTTL = Duration("0 seconds")
     val timeout = Duration("5 seconds")
-
-    implicit def serializer[T] = Serialization.JBoss[T]
 
     sequential
     "The memcached client" should {

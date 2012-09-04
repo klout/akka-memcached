@@ -11,7 +11,7 @@ import scala.collection.JavaConversions._
 import com.clarkware.junitperf._
 import akka.dispatch.Await
 import akka.util.duration._
-
+import Serialization.JBoss
 class JbossSerializingTranscoder extends SerializingTranscoder {
 
     override def serialize(o: AnyRef): Array[Byte] = {
@@ -56,7 +56,6 @@ class JbossSerializingTranscoder extends SerializingTranscoder {
 }
 
 object PerformanceTest {
-    implicit def serializer[T] = Serialization.JBoss[T]
 
     val bigMapAkka = (1 to 1000).map(num => "Akka" + num.toString -> ("String #" + num)) toMap
     val bigListAkka = (1 to 1000).map("Akka String #" + _)
