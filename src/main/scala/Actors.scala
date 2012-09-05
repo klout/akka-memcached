@@ -5,7 +5,7 @@ import akka.util.ByteString
 import java.net.InetSocketAddress
 import akka.dispatch.Future
 import com.klout.akkamemcache.Protocol._
-import scala.collection.mutable.{ HashMap, HashSet }
+import scala.collection.mutable.{ HashMap, LinkedHashSet }
 import com.klout.akkamemcache.Protocol._
 import scala.collection.JavaConversions._
 import scala.util.Random
@@ -162,15 +162,20 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
     var connection: IO.SocketHandle = _
 
     /**
+     * The maximum number of keys that can be queried in a single multiget
+     */
+    val maxKeyLimit = 5
+
+    /**
      * Contains the pending results for a Memcache multiget that is currently
      * in progress
      */
-    val currentSet: HashSet[String] = new HashSet()
+    val currentSet: LinkedHashSet[String] = new LinkedHashSet()
 
     /**
      * Contains the pending results for the next Memcached multiget
      */
-    val nextSet: HashSet[String] = new HashSet()
+    val nextSet: LinkedHashSet[String] = new LinkedHashSet()
 
     /**
      * Opens a single connection to the Memcached server
@@ -222,8 +227,8 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
         awaitingResponseFromMemcached = false
         poolActor ! GetResults(currentSet.map(NotFound).toSet)
         currentSet --= currentSet
-        currentSet ++= nextSet
-        nextSet --= nextSet
+        currentSet ++= (nextSet take maxKeyLimit)
+        nextSet --= (nextSet take maxKeyLimit)
         writeGetCommandToMemcachedIfPossible()
     }
 
