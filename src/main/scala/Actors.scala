@@ -164,7 +164,7 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
     /**
      * The maximum number of keys that can be queried in a single multiget
      */
-    val maxKeyLimit = 5
+    val maxKeyLimit = 1
 
     /**
      * Contains the pending results for a Memcache multiget that is currently
@@ -193,12 +193,7 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
     def enqueueCommand(keys: Set[String]) {
         /* Remove duplicate keys */
         val newKeys = keys diff (nextSet ++ currentSet)
-        val (set, otherSet) = if (awaitingResponseFromMemcached) (nextSet, currentSet) else (currentSet, nextSet)
-
-        val numDeduplicatedFromSet = (keys intersect set).size
-        val numDeduplicatedFromOtherSet = (keys intersect otherSet).size
-        // log.debug("Dedup " + numDeduplicatedFromSet + " from set with size " + set.size)
-        // log.debug("Dedup " + numDeduplicatedFromOtherSet + " from otherSet with size " + otherSet.size)
+        val set = if (awaitingResponseFromMemcached) nextSet else currentSet
 
         set ++= newKeys
 

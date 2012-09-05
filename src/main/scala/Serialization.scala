@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable
 import java.io.IOException
 import java.util.Calendar
+import scala.collection.JavaConversions._
 
 object `package` {
 
@@ -47,12 +48,16 @@ object Serialization {
             }
         }
         def deserialize(in: ByteString): T = {
-            val bis = new ByteArrayInputStream(in.iterator.toArray)
+            //val start = Calendar.getInstance().getTimeInMillis
+            val bis = new ByteArrayInputStream(in.toArray)
             val is = new JBossObjectInputStream(bis)
             val obj = using(bis, is) {
                 is readObject
             }
-            obj.asInstanceOf[T]
+            val result = obj.asInstanceOf[T]
+            //val end = Calendar.getInstance().getTimeInMillis
+            //println("Deserialization took: " + (end - start) + " ms")
+            result
         }
     }
 }

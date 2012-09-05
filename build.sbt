@@ -3,11 +3,12 @@ import scalariform.formatter.preferences._
 
 name := "akka-memcached"
 
-version := "0.25"
+version := "0.28"
 
 scalaVersion := "2.9.1"
 
 libraryDependencies ++= Seq(
+    "org.apache.avro" % "avro-ipc" % "1.7.1",
  	"log4j" % "log4j" % "1.2.14",
 	"jboss" % "jboss-serialization" % "1.0.3.GA",
 	"trove" % "trove" % "1.0.2",
