@@ -33,7 +33,7 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
     val ioActorMap: HashMap[String, IoActorRouterRef] = new HashMap()
 
     /**
-     * RequestMap maps requesting IoActors to the results that the actor has recieved from memcached.
+     * RequestMap maps the requesting actor to the results that will be recieved from memcached.
      */
     val requestMap: HashMap[RequestorActorRef, HashMap[String, Option[GetResult]]] = new HashMap()
 
@@ -192,8 +192,8 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
 
         val numDeduplicatedFromSet = (keys intersect set).size
         val numDeduplicatedFromOtherSet = (keys intersect otherSet).size
-        log.debug("Dedup " + numDeduplicatedFromSet + " from set with size " + set.size)
-        log.debug("Dedup " + numDeduplicatedFromOtherSet + " from otherSet with size " + otherSet.size)
+        // log.debug("Dedup " + numDeduplicatedFromSet + " from set with size " + set.size)
+        // log.debug("Dedup " + numDeduplicatedFromOtherSet + " from otherSet with size " + otherSet.size)
 
         set ++= newKeys
 
