@@ -26,7 +26,7 @@ class Iteratees(ioActor: ActorRef) {
         !whitespaceBytes.contains(byte)
     }
 
-    val readInput = {
+    val readInput = time("readInput"){
         (IO takeWhile notWhitespace) flatMap {
 
             /**
@@ -58,7 +58,7 @@ class Iteratees(ioActor: ActorRef) {
      * <data block>\r\n
      *
      */
-    val processValue = {
+    val processValue = time("processValue"){
         for {
             whitespace <- IO takeUntil Space;
             key <- IO takeUntil Space;
@@ -67,8 +67,10 @@ class Iteratees(ioActor: ActorRef) {
             value <- IO take length;
             newline <- IO takeUntil CRLF
         } yield {
-            val found = Found(ascii(key), value)
-            IO Done found
+            time("Create found"){
+                val found = Found(ascii(key), value)
+                IO Done found
+            }
         }
     }
 
@@ -76,7 +78,7 @@ class Iteratees(ioActor: ActorRef) {
      * Consumes all of the input from the Iteratee and sends the results
      * to the appropriate IoActor.
      */
-    val processInput = {
+    val processInput = time("processInput"){
         IO repeat {
             readInput map {
                 case IO.Done(found) => {
@@ -186,7 +188,7 @@ object Protocol {
          * A get instruction looks like:
          * get <key>*\r\n
          */
-        override def toByteString = {
+        override def toByteString = time("getCommand toByteString"){
             if (keys.size > 0) ByteString("get " + (keys mkString " ")) ++ CRLF
             else ByteString()
         }

@@ -1,4 +1,5 @@
 package com.klout.akkamemcache
+
 import akka.util.ByteString
 import org.jboss.serial.io._
 import java.io.ByteArrayInputStream;
@@ -7,24 +8,24 @@ import java.io.Closeable
 import java.io.IOException
 import java.util.Calendar
 import scala.collection.JavaConversions._
-
-object `package` {
-
-    def using[C <: Closeable, V](closeables: C*)(f: () => V): V = {
-        try {
-            f.apply
-        } finally {
-            for (closeable <- closeables) { safely { closeable.close() } }
-        }
-    }
-
-    def safely(f: => Any) {
-        try { f } catch { case error => {} }
-    }
-}
+import org.apache.avro.util.ByteBufferInputStream
 
 object Serialization {
+
     implicit def JBoss[T <: Any] = new SerializerWithDeserializer[T] {
+
+        def using[C <: Closeable, V](closeables: C*)(f: () => V): V = {
+            try {
+                f.apply
+            } finally {
+                for (closeable <- closeables) { safely { closeable.close() } }
+            }
+        }
+
+        def safely(f: => Any) {
+            try { f } catch { case error => {} }
+        }
+
         def serialize(o: T): ByteString = {
             Option(o) match {
                 case None => throw new NullPointerException("Can't serialize null")
@@ -47,17 +48,22 @@ object Serialization {
                     }
             }
         }
-        def deserialize(in: ByteString): T = {
-            //val start = Calendar.getInstance().getTimeInMillis
-            val bis = new ByteArrayInputStream(in.toArray)
-            val is = new JBossObjectInputStream(bis)
-            val obj = using(bis, is) {
-                is readObject
+        def deserialize(in: ByteString): T = time("deserialize"){
+            val input = time("Convert bytestring to bytearray"){
+                in.toArray
             }
-            val result = obj.asInstanceOf[T]
-            //val end = Calendar.getInstance().getTimeInMillis
-            //println("Deserialization took: " + (end - start) + " ms")
-            result
+            val bis = time("Create ByteArrayInputStream"){
+                new ByteArrayInputStream(input)
+            }
+            val is = time("Create JBossObjectInputStream"){
+                new JBossObjectInputStream(bis)
+            }
+            val obj = time("ReadObject"){
+                using(bis, is) {
+                    is readObject
+                }
+            }
+            time("Cast object to correct type"){ obj.asInstanceOf[T] }
         }
     }
 }

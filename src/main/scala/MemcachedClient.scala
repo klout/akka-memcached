@@ -7,8 +7,20 @@ import akka.util.duration._
 import akka.pattern.ask
 import akka.util.Timeout
 import akka.util.ByteString
+import java.util.Calendar
 
 import com.klout.akkamemcache.Protocol._
+
+object `package` {
+    def time[T](name: String)(runnable: => T) = {
+        val start = Calendar.getInstance().getTimeInMillis
+        val result = runnable
+        val end = Calendar.getInstance().getTimeInMillis
+        println(name + " took " + (end - start) + " ms")
+        result
+    }
+}
+
 /**
  * Asynchronous memcached client.
  */
@@ -66,15 +78,17 @@ class RealMemcachedClient(hosts: List[(String, Int)], connectionsPerServer: Int 
     }
 
     override def mget[T: Deserializer](keys: Set[String]): Future[Map[String, T]] = {
-        val command = GetCommand(keys)
-        (poolActor ? command).map{
-            case result: List[GetResult] => {
-                result.flatMap {
-                    case Found(key, value) => Some(key, Deserializer.deserialize[T](value))
-                    case NotFound(key)     => None
-                }
-            }.toMap
-            case other => throw new Exception("Invalid result returned: " + other)
+        time("mget"){
+            val command = GetCommand(keys)
+            (poolActor ? command).map{
+                case result: List[GetResult] => {
+                    result.flatMap {
+                        case Found(key, value) => Some(key, Deserializer.deserialize[T](value))
+                        case NotFound(key)     => None
+                    }
+                }.toMap
+                case other => throw new Exception("Invalid result returned: " + other)
+            }
         }
     }
 

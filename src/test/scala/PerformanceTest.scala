@@ -14,6 +14,18 @@ import akka.util.duration._
 import Serialization.JBoss
 class JbossSerializingTranscoder extends SerializingTranscoder {
 
+    def using[C <: Closeable, V](closeables: C*)(f: () => V): V = {
+        try {
+            f.apply
+        } finally {
+            for (closeable <- closeables) { safely { closeable.close() } }
+        }
+    }
+
+    def safely(f: => Any) {
+        try { f } catch { case error => {} }
+    }
+
     override def serialize(o: AnyRef): Array[Byte] = {
         Option(o) match {
             case None => throw new NullPointerException("Can't serialize null")
@@ -31,13 +43,14 @@ class JbossSerializingTranscoder extends SerializingTranscoder {
         }
     }
 
-    override def deserialize(in: Array[Byte]): AnyRef = {
+    override def deserialize(in: Array[Byte]): AnyRef = time("spy deserialize"){
         Option(in) match {
             case Some(in) =>
                 try {
 
                     val bis = new ByteArrayInputStream(in)
                     val is = new JBossObjectInputStream(bis)
+
                     using(bis, is) {
                         is readObject
                     }
@@ -130,17 +143,17 @@ object PerformanceTest {
         suite addTest new TimedTest(new AkkaMemcachedTests("akkaSet"), 30000)
         suite addTest new TimedTest(new SpyMemcachedTests("spySet"), 30000)
 
-        suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetSingleString"), 30000)
-        suite addTest new TimedTest(new SpyMemcachedTests("spyGetSingleString"), 30000)
+        // suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetSingleString"), 30000)
+        // suite addTest new TimedTest(new SpyMemcachedTests("spyGetSingleString"), 30000)
 
-        suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetManyStrings"), 30000)
-        suite addTest new TimedTest(new SpyMemcachedTests("spyGetManyStrings"), 30000)
+        // suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetManyStrings"), 30000)
+        // suite addTest new TimedTest(new SpyMemcachedTests("spyGetManyStrings"), 30000)
 
         suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetSingleBigObject"), 30000)
         suite addTest new TimedTest(new SpyMemcachedTests("spyGetSingleBigObject"), 30000)
 
-        suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetManyBigObjects"), 30000)
-        suite addTest new TimedTest(new SpyMemcachedTests("spyGetManyBigObjects"), 30000)
+        // suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetManyBigObjects"), 30000)
+        // suite addTest new TimedTest(new SpyMemcachedTests("spyGetManyBigObjects"), 30000)
         suite
     }
 
