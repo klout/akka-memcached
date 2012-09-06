@@ -13,7 +13,6 @@ import com.klout.akkamemcache.Protocol._
 
 object `package` {
     def time[T](name: String)(runnable: => T) = {
-        // DEBUG
         // val start = Calendar.getInstance().getTimeInMillis
         val result = runnable
         // val end = Calendar.getInstance().getTimeInMillis
@@ -57,7 +56,7 @@ trait MemcachedClient {
 }
 
 class RealMemcachedClient(hosts: List[(String, Int)], connectionsPerServer: Int = 1) extends MemcachedClient {
-    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+    implicit val timeout = Timeout(60 seconds) // needed for `?` below
 
     val system = ActorSystem()
 

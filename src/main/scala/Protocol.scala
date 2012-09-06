@@ -68,9 +68,7 @@ class Iteratees(ioActor: ActorRef) {
             key <- IO takeUntil Space;
             id <- IO takeUntil Space;
             length <- IO takeUntil CRLF map (ascii(_).toInt);
-            val x = println("In processValue");
             value <- byteArray(length);
-            val y = println("Took value")
             newline <- IO takeUntil CRLF
         } yield {
             time("Create found"){
@@ -81,24 +79,24 @@ class Iteratees(ioActor: ActorRef) {
     }
 
     def byteArray(length: Int): Iteratee[Array[Byte]] = {
-        def continue(array: Array[Byte], total: Int, current: Int)(input: Input): (Iteratee[Array[Byte]], Input) = input match {
-            case Chunk(byteString) =>
-                println("Byte: " + current + " Total: " + total)
-                val bytes = byteString.toArray
-                val numToCopy = min(total - current, bytes.size)
-                Array.copy(bytes, 0, array, current, numToCopy)
-                val chunk = if (numToCopy == bytes.size) {
-                    Chunk.empty
-                } else {
-                    Chunk(byteString drop numToCopy)
-                }
-                if (total == current + numToCopy) (Done(array), chunk)
-                else {
-                    println("Continuing")
-                    (Cont(continue(array, total, current + numToCopy)), chunk)
-                }
-            case EOF(cause) => throw new Exception("EOF") //(Failure(new EOFException("Unexpected EOF")), EOF)
-            case _          => throw new Exception("Something else")
+        def continue(array: Array[Byte], total: Int, current: Int)(input: Input): (Iteratee[Array[Byte]], Input) = time("byteArray"){
+            input match {
+                case Chunk(byteString) =>
+                    val bytes = byteString.toArray
+                    val numToCopy = min(total - current, bytes.size)
+                    Array.copy(bytes, 0, array, current, numToCopy)
+                    val chunk = if (numToCopy == bytes.size) {
+                        Chunk.empty
+                    } else {
+                        Chunk(byteString drop numToCopy)
+                    }
+                    if (total == current + numToCopy) (Done(array), chunk)
+                    else {
+                        (Cont(continue(array, total, current + numToCopy)), chunk)
+                    }
+                case EOF(cause) => throw new Exception("EOF") //(Failure(new EOFException("Unexpected EOF")), EOF)
+                case _          => throw new Exception("Something else")
+            }
         }
         Cont(continue(new Array(length), length, 0))
     }

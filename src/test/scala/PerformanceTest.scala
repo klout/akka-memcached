@@ -149,8 +149,8 @@ object PerformanceTest {
         // suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetManyStrings"), 30000)
         // suite addTest new TimedTest(new SpyMemcachedTests("spyGetManyStrings"), 30000)
 
-        suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetSingleBigObject"), 30000)
-        suite addTest new TimedTest(new SpyMemcachedTests("spyGetSingleBigObject"), 30000)
+        suite addTest new LoadTest(new TimedTest(new AkkaMemcachedTests("akkaGetSingleBigObject"), 30000), 100)
+        suite addTest new LoadTest(new TimedTest(new SpyMemcachedTests("spyGetSingleBigObject"), 30000), 100)
 
         // suite addTest new TimedTest(new AkkaMemcachedTests("akkaGetManyBigObjects"), 30000)
         // suite addTest new TimedTest(new SpyMemcachedTests("spyGetManyBigObjects"), 30000)

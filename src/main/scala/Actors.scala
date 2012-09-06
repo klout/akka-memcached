@@ -181,7 +181,7 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
     /**
      * The maximum number of keys that can be queried in a single multiget
      */
-    val maxKeyLimit = 20
+    val maxKeyLimit = 1000
 
     /**
      * Contains the pending results for a Memcache multiget that is currently
@@ -226,7 +226,9 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
         if (!awaitingResponseFromMemcached) {
             if (currentSet.size > 0) {
                 time("writeGetCommandToMemcached"){
+                    log debug "Starting getCommand write to memcached"
                     connection.write(GetCommand(currentSet.toSet).toByteString)
+                    log debug "Finished getCommand write to memcached"
                 }
                 awaitingResponseFromMemcached = true
             } else {
@@ -273,7 +275,11 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
         /**
          * Immediately writes a command to Memcached
          */
-        case command: Command       => connection write command.toByteString
+        case command: Command => {
+            log debug "Starting setCommand write"
+            connection write command.toByteString
+            log debug "Finished setCommand write"
+        }
 
         /**
          * Reads data from Memcached. The iteratee will send the result
