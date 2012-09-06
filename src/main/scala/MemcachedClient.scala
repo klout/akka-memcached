@@ -13,10 +13,11 @@ import com.klout.akkamemcache.Protocol._
 
 object `package` {
     def time[T](name: String)(runnable: => T) = {
-        val start = Calendar.getInstance().getTimeInMillis
+        // DEBUG
+        // val start = Calendar.getInstance().getTimeInMillis
         val result = runnable
-        val end = Calendar.getInstance().getTimeInMillis
-        println(name + " took " + (end - start) + " ms")
+        // val end = Calendar.getInstance().getTimeInMillis
+        // println(name + " took " + (end - start) + " ms")
         result
     }
 }
@@ -83,7 +84,7 @@ class RealMemcachedClient(hosts: List[(String, Int)], connectionsPerServer: Int 
             (poolActor ? command).map{
                 case result: List[GetResult] => {
                     result.flatMap {
-                        case Found(key, value) => Some(key, Deserializer.deserialize[T](value))
+                        case Found(key, value) => Some((key, Deserializer.deserialize[T](value)))
                         case NotFound(key)     => None
                     }
                 }.toMap

@@ -1,11 +1,11 @@
 package com.klout.akkamemcache
 
-import akka.actor.IO
 import akka.util.ByteString
 import akka.actor._
 import com.google.common.hash.Hashing._
 import Protocol._
 import ActorTypes._
+import akka.actor.IO._
 
 /**
  * Object sent to the IOActor indicating that a multiget request is complete.
@@ -17,6 +17,10 @@ object Finished
  * the cache hits and misses to the IoActor that manages the connection
  */
 class Iteratees(ioActor: ActorRef) {
+
+    def min(a: Int, b: Int) = {
+        if (a < b) a else b
+    }
     import Constants._
 
     /**
@@ -64,7 +68,9 @@ class Iteratees(ioActor: ActorRef) {
             key <- IO takeUntil Space;
             id <- IO takeUntil Space;
             length <- IO takeUntil CRLF map (ascii(_).toInt);
-            value <- IO take length;
+            val x = println("In processValue");
+            value <- byteArray(length);
+            val y = println("Took value")
             newline <- IO takeUntil CRLF
         } yield {
             time("Create found"){
@@ -72,6 +78,29 @@ class Iteratees(ioActor: ActorRef) {
                 IO Done found
             }
         }
+    }
+
+    def byteArray(length: Int): Iteratee[Array[Byte]] = {
+        def continue(array: Array[Byte], total: Int, current: Int)(input: Input): (Iteratee[Array[Byte]], Input) = input match {
+            case Chunk(byteString) =>
+                println("Byte: " + current + " Total: " + total)
+                val bytes = byteString.toArray
+                val numToCopy = min(total - current, bytes.size)
+                Array.copy(bytes, 0, array, current, numToCopy)
+                val chunk = if (numToCopy == bytes.size) {
+                    Chunk.empty
+                } else {
+                    Chunk(byteString drop numToCopy)
+                }
+                if (total == current + numToCopy) (Done(array), chunk)
+                else {
+                    println("Continuing")
+                    (Cont(continue(array, total, current + numToCopy)), chunk)
+                }
+            case EOF(cause) => throw new Exception("EOF") //(Failure(new EOFException("Unexpected EOF")), EOF)
+            case _          => throw new Exception("Something else")
+        }
+        Cont(continue(new Array(length), length, 0))
     }
 
     /**

@@ -48,12 +48,9 @@ object Serialization {
                     }
             }
         }
-        def deserialize(in: ByteString): T = time("deserialize"){
-            val input = time("Convert bytestring to bytearray"){
-                in.toArray
-            }
+        def deserialize(in: Array[Byte]): T = time("deserialize"){
             val bis = time("Create ByteArrayInputStream"){
-                new ByteArrayInputStream(input)
+                new ByteArrayInputStream(in)
             }
             val is = time("Create JBossObjectInputStream"){
                 new JBossObjectInputStream(bis)
@@ -77,11 +74,11 @@ object Serializer {
 }
 
 trait Deserializer[T] {
-    def deserialize(bytes: ByteString): T
+    def deserialize(bytes: Array[Byte]): T
 }
 
 object Deserializer {
-    def deserialize[T: Deserializer](bytes: ByteString): T = implicitly[Deserializer[T]] deserialize bytes
+    def deserialize[T: Deserializer](bytes: Array[Byte]): T = implicitly[Deserializer[T]] deserialize bytes
 }
 
 trait SerializerWithDeserializer[T] extends Serializer[T] with Deserializer[T]

@@ -312,7 +312,7 @@ case class GetResults(results: Set[GetResult])
 /**
  * Cache Hit
  */
-case class Found(key: String, value: ByteString) extends GetResult
+case class Found(key: String, value: Array[Byte]) extends GetResult
 
 /**
  * Cache Miss
