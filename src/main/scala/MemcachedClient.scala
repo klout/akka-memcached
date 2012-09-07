@@ -30,12 +30,16 @@ trait MemcachedClient {
     def mset[T: Serializer](values: Map[String, T], ttl: Duration = DefaultTTL): Unit
 
     /**
-     * Retrieves the value of a single key
+     * Retrieves the value of a single key. In the case of a cache miss, this method will
+     * return a Future containing None. Otherwise, this method will return a Future of
+     * Some[T]
      */
     def get[T: Serializer](key: String): Future[Option[T]]
 
     /**
-     * Retrieves the values of multiple keys
+     * Retrieves the values of multiple keys. This method returns a future of a mapping from
+     * cache keys to values. Keys that do not exist in Memcached will not be included in the
+     * map
      */
     def mget[T: Serializer](keys: Set[String]): Future[Map[String, T]]
 
