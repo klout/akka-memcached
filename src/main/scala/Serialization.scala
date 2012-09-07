@@ -58,19 +58,13 @@ object Serialization {
             }
         }
 
-        def deserialize(in: Array[Byte]): T = time("deserialize"){
-            val bis = time("Create ByteArrayInputStream"){
-                new ByteArrayInputStream(in)
+        def deserialize(in: Array[Byte]): T = {
+            val bis = new ByteArrayInputStream(in)
+            val is = new JBossObjectInputStream(bis)
+            val obj = using(bis, is) {
+                is readObject
             }
-            val is = time("Create JBossObjectInputStream"){
-                new JBossObjectInputStream(bis)
-            }
-            val obj = time("ReadObject"){
-                using(bis, is) {
-                    is readObject
-                }
-            }
-            time("Cast object to correct type"){ obj.asInstanceOf[T] }
+            obj.asInstanceOf[T]
         }
     }
 }

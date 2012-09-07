@@ -47,15 +47,13 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
      * that requested it.
      */
     def updateRequestMap(result: GetResult) = {
-        time("updateRequestMap"){
-            requestMap ++= requestMap map {
-                case (actor, resultMap) => {
-                    val newResultMap = resultMap map {
-                        case (key, resultOption) if key == result.key => (key, Some(result))
-                        case other                                    => other
-                    }
-                    (actor, newResultMap)
+        requestMap ++= requestMap map {
+            case (actor, resultMap) => {
+                val newResultMap = resultMap map {
+                    case (key, resultOption) if key == result.key => (key, Some(result))
+                    case other                                    => other
                 }
+                (actor, newResultMap)
             }
         }
     }
@@ -65,16 +63,14 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
      * function will send the results to the actor and remove the actor from the requestMap
      */
     def sendResponses() {
-        time("sendResponses"){
-            val responsesToSend = requestMap.flatMap{
-                case (actor, resultMap) if (!resultMap.values.toList.contains(None)) => Some(actor, resultMap)
-                case other => None
-            }
-            responsesToSend foreach {
-                case (actor, responses) =>
-                    actor ! responses.values.flatten
-                    requestMap -= actor
-            }
+        val responsesToSend = requestMap.flatMap{
+            case (actor, resultMap) if (!resultMap.values.toList.contains(None)) => Some(actor, resultMap)
+            case other => None
+        }
+        responsesToSend foreach {
+            case (actor, responses) =>
+                actor ! responses.values.flatten
+                requestMap -= actor
         }
     }
 
@@ -103,33 +99,31 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
      * appropriate IoActors.
      */
     def forwardCommand(command: Command) = {
-        time("forwardCommand"){
-            val hostCommandMap = command match {
-                case SetCommand(keyValueMap, ttl) => {
-                    val splitKeyValues = keyValueMap.groupBy{
-                        case (key, value) => hosts(consistentHash(key.hashCode, hosts.size))
-                    }
-                    splitKeyValues.map{
-                        case (host, keyValueMap) => (host, SetCommand(keyValueMap, ttl))
-                    }
+        val hostCommandMap = command match {
+            case SetCommand(keyValueMap, ttl) => {
+                val splitKeyValues = keyValueMap.groupBy{
+                    case (key, value) => hosts(consistentHash(key.hashCode, hosts.size))
                 }
-                case GetCommand(keys) => {
-                    val splitKeys = keys.groupBy(key => hosts(consistentHash(key.hashCode, hosts.size)))
-                    splitKeys.map{
-                        case (host, keys) => (host, GetCommand(keys))
-                    }
-                }
-                case command: DeleteCommand => {
-                    val splitKeys = command.keys.groupBy(key => hosts(consistentHash(key.hashCode, hosts.size)))
-                    splitKeys.map{
-                        case (host, keys) => (host, DeleteCommand(keys: _*))
-                    }
+                splitKeyValues.map{
+                    case (host, keyValueMap) => (host, SetCommand(keyValueMap, ttl))
                 }
             }
+            case GetCommand(keys) => {
+                val splitKeys = keys.groupBy(key => hosts(consistentHash(key.hashCode, hosts.size)))
+                splitKeys.map{
+                    case (host, keys) => (host, GetCommand(keys))
+                }
+            }
+            case command: DeleteCommand => {
+                val splitKeys = command.keys.groupBy(key => hosts(consistentHash(key.hashCode, hosts.size)))
+                splitKeys.map{
+                    case (host, keys) => (host, DeleteCommand(keys: _*))
+                }
+            }
+        }
 
-            hostCommandMap foreach {
-                case ((host, port), command) => ioActorMap(host) ! command
-            }
+        hostCommandMap foreach {
+            case ((host, port), command) => ioActorMap(host) ! command
         }
     }
 
@@ -139,18 +133,12 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
          * result can be returned to the requester.
          */
         case command @ GetCommand(keys) =>
-            time("Poolactor recieve getCommand"){
 
-                val keyResultMap = time("Create keyResultMap"){
-                    keys.map {
-                        key => key -> None
-                    }.toList
-                }
-                time("Add to requestmap"){
-                    requestMap += ((sender, HashMap(keyResultMap: _*)))
-                }
-                forwardCommand(command)
-            }
+            val keyResultMap = keys.map {
+                key => key -> None
+            }.toList
+            requestMap += ((sender, HashMap(keyResultMap: _*)))
+            forwardCommand(command)
 
         /* Route a SetCommand or DeleteCommand to the correct IoActor */
         case command: Command => forwardCommand(command)
@@ -160,16 +148,12 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
          * send responses to the actors if their request has been fulfilled.
          */
         case result: GetResult => {
-            time("PoolActor recieves getResult"){
-                updateRequestMap(result)
-                sendResponses()
-            }
+            updateRequestMap(result)
+            sendResponses()
         }
         case GetResults(results) => {
-            time("Poolactor recieves getResults"){
-                results foreach updateRequestMap
-                sendResponses()
-            }
+            results foreach updateRequestMap
+            sendResponses()
         }
     }
 }
@@ -214,12 +198,10 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
      */
     def enqueueCommand(keys: Set[String]) {
         /* Remove duplicate keys */
-        time("enqueueCommand"){
-            val newKeys = keys diff (nextSet ++ currentSet)
-            val set = if (awaitingResponseFromMemcached) nextSet else currentSet
+        val newKeys = keys diff (nextSet ++ currentSet)
+        val set = if (awaitingResponseFromMemcached) nextSet else currentSet
 
-            set ++= newKeys
-        }
+        set ++= newKeys
 
     }
 
@@ -230,11 +212,9 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
     def writeGetCommandToMemcachedIfPossible() {
         if (!awaitingResponseFromMemcached) {
             if (currentSet.size > 0) {
-                time("writeGetCommandToMemcached"){
-                    log debug "Starting getCommand write to memcached"
-                    connection.write(GetCommand(currentSet.toSet).toByteString)
-                    log debug "Finished getCommand write to memcached"
-                }
+                log debug "Starting getCommand write to memcached"
+                connection.write(GetCommand(currentSet.toSet).toByteString)
+                log debug "Finished getCommand write to memcached"
                 awaitingResponseFromMemcached = true
             } else {
                 awaitingResponseFromMemcached = false
@@ -247,14 +227,12 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
      * in currentSet are cache misses.
      */
     def getCommandCompleted() {
-        time("getCommandCompleted"){
-            awaitingResponseFromMemcached = false
-            poolActor ! GetResults(currentSet.map(NotFound).toSet)
-            currentSet --= currentSet
-            currentSet ++= (nextSet take maxKeyLimit)
-            nextSet --= (nextSet take maxKeyLimit)
-            writeGetCommandToMemcachedIfPossible()
-        }
+        awaitingResponseFromMemcached = false
+        poolActor ! GetResults(currentSet.map(NotFound).toSet)
+        currentSet --= currentSet
+        currentSet ++= (nextSet take maxKeyLimit)
+        nextSet --= (nextSet take maxKeyLimit)
+        writeGetCommandToMemcachedIfPossible()
     }
 
     /**

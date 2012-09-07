@@ -12,16 +12,6 @@ import java.net.URLEncoder._
 
 import com.klout.akkamemcache.Protocol._
 
-object `package` {
-    def time[T](name: String)(runnable: => T) = {
-        // val start = Calendar.getInstance().getTimeInMillis
-        val result = runnable
-        // val end = Calendar.getInstance().getTimeInMillis
-        // println(name + " took " + (end - start) + " ms")
-        result
-    }
-}
-
 /**
  * Asynchronous memcached client.
  */
@@ -84,17 +74,15 @@ class RealMemcachedClient(hosts: List[(String, Int)], connectionsPerServer: Int 
     }
 
     override def mget[T: Serializer](keys: Set[String]): Future[Map[String, T]] = {
-        time("mget"){
-            val command = GetCommand(keys)
-            (poolActor ? command).map{
-                case result: List[GetResult] => {
-                    result.flatMap {
-                        case Found(key, value) => Some((key, Serializer.deserialize[T](value)))
-                        case NotFound(key)     => None
-                    }
-                }.toMap
-                case other => throw new Exception("Invalid result returned: " + other)
-            }
+        val command = GetCommand(keys)
+        (poolActor ? command).map{
+            case result: List[GetResult] => {
+                result.flatMap {
+                    case Found(key, value) => Some((key, Serializer.deserialize[T](value)))
+                    case NotFound(key)     => None
+                }
+            }.toMap
+            case other => throw new Exception("Invalid result returned: " + other)
         }
     }
 

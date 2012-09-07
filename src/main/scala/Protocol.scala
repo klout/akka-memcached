@@ -31,7 +31,7 @@ class Iteratees(ioActor: ActorRef) {
         !whitespaceBytes.contains(byte)
     }
 
-    val readInput = time("readInput"){
+    val readInput = {
         (IO takeWhile notWhitespace) flatMap {
 
             /**
@@ -63,7 +63,7 @@ class Iteratees(ioActor: ActorRef) {
      * <data block>\r\n
      *
      */
-    val processValue = time("processValue"){
+    val processValue = {
         for {
             whitespace <- IO takeUntil Space;
             key <- IO takeUntil Space;
@@ -72,15 +72,18 @@ class Iteratees(ioActor: ActorRef) {
             value <- byteArray(length);
             newline <- IO takeUntil CRLF
         } yield {
-            time("Create found"){
-                val found = Found(ascii(key), value)
-                IO Done found
-            }
+            val found = Found(ascii(key), value)
+            IO Done found
         }
     }
 
+    /**
+     * This iteratee generates a byte array result from Memcached. Because the
+     * length of the memcached response is known, this has better performance
+     * than bytestrings when deserializing.
+     */
     def byteArray(length: Int): Iteratee[Array[Byte]] = {
-        def continue(array: Array[Byte], total: Int, current: Int)(input: Input): (Iteratee[Array[Byte]], Input) = time("byteArray"){
+        def continue(array: Array[Byte], total: Int, current: Int)(input: Input): (Iteratee[Array[Byte]], Input) = {
             input match {
                 case Chunk(byteString) =>
                     val bytes = byteString.toArray
@@ -106,7 +109,7 @@ class Iteratees(ioActor: ActorRef) {
      * Consumes all of the input from the Iteratee and sends the results
      * to the appropriate IoActor.
      */
-    val processInput = time("processInput"){
+    val processInput = {
         IO repeat {
             readInput map {
                 case IO.Done(found) => {
@@ -216,7 +219,7 @@ object Protocol {
          * A get instruction looks like:
          * get <key>*\r\n
          */
-        override def toByteString = time("getCommand toByteString"){
+        override def toByteString = {
             if (keys.size > 0) ByteString("get " + (keys mkString " ")) ++ CRLF
             else ByteString()
         }
