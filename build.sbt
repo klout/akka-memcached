@@ -3,7 +3,8 @@ import scalariform.formatter.preferences._
 
 name := "akka-memcached"
 
-version := "0.1"
+version := "0.9"
+
 
 scalaVersion := "2.9.1"
 

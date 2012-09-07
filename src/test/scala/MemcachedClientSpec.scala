@@ -1,23 +1,20 @@
 package test
 
-import org.specs2.execute.PendingUntilFixed
-import org.specs2.mutable._
-import akka.util.duration._
-import akka.util.Duration
 import akka.actor._
-import akka.util.ByteString
 import akka.dispatch.Await
-import scala.reflect.BeanProperty
-import scala.collection.mutable.HashMap
-import com.klout.akkamemcache._
-import akka.util.Timeout
 import akka.pattern.ask
+import akka.util.{ ByteString, Duration, Timeout }
+import akka.util.duration._
+
+import com.klout.akkamemcache._
+import org.specs2.mutable.Specification
+import scala.collection.mutable.HashMap
 import scala.util.Random
 
-object GiveMeTheState // Command to give the state to the test
+object GiveMeTheState 
 
 class FakeIoActor extends Actor {
-    var state: HashMap[String, Any] = new HashMap()
+    val state: HashMap[String, Any] = new HashMap()
     def receive = {
         case Finished          => state += (("Finished" -> true))
         case GiveMeTheState    => sender ! state
@@ -27,7 +24,12 @@ class FakeIoActor extends Actor {
     }
 }
 
-class MemcachedClientSpec extends Specification with PendingUntilFixed {
+/**
+ * This test verifies that the client understands the memcached protocol. It generates
+ * fake outputs from memcached and ensures that the protocol correctly parses the 
+ * result.
+ */
+class MemcachedClientSpec extends Specification {
     implicit val timeout = Timeout(Duration("30 seconds")) // needed for `?` below
     implicit val system = ActorSystem()
     val fakeIoActor = system.actorOf(Props[FakeIoActor])
@@ -43,15 +45,15 @@ class MemcachedClientSpec extends Specification with PendingUntilFixed {
         "properly parse a single result" in {
             val command = ByteString("VALUE testKey 0 10\r\nabcdefghij\r\nEND\r\n")
             iteratee(IO Chunk command)
-            Await.result((fakeIoActor ? "testKey"), Duration("1 second")).asInstanceOf[Option[ByteString]] must_== Some(ByteString("abcdefghij"))
+            ByteString(Await.result((fakeIoActor ? "testKey"), Duration("1 second")).asInstanceOf[Option[Array[Byte]]].get) must_== ByteString("abcdefghij")
         }
         "properly parse multiple results" in {
             val command1 = ByteString("VALUE testKey2 0 5\r\n01234\r\n")
             val command2 = ByteString("VALUE testKey3 0 7\r\n5678910\r\nEND\r\n")
             val commands = command1 ++ command2
             iteratee(IO Chunk commands)
-            Await.result((fakeIoActor ? "testKey2"), Duration("1 second")).asInstanceOf[Option[ByteString]] must_== Some(ByteString("01234"))
-            Await.result((fakeIoActor ? "testKey3"), Duration("1 second")).asInstanceOf[Option[ByteString]] must_== Some(ByteString("5678910"))
+            ByteString(Await.result((fakeIoActor ? "testKey2"), Duration("1 second")).asInstanceOf[Option[Array[Byte]]].get) must_== ByteString("01234")
+            ByteString(Await.result((fakeIoActor ? "testKey3"), Duration("1 second")).asInstanceOf[Option[Array[Byte]]].get) must_== ByteString("5678910")
         }
         "parse some very large results" in {
             val generator = new Random()
@@ -63,15 +65,15 @@ class MemcachedClientSpec extends Specification with PendingUntilFixed {
             val command2 = ByteString("VALUE random2 0 50\r\n") ++ ByteString(bytes2) ++ ByteString("\r\nEND\r\n")
             val commands = command1 ++ command2
             iteratee(IO Chunk commands)
-            Await.result((fakeIoActor ? "random1"), Duration("1 second")).asInstanceOf[Option[ByteString]] must_== Some(ByteString(bytes1))
-            Await.result((fakeIoActor ? "random2"), Duration("1 second")).asInstanceOf[Option[ByteString]] must_== Some(ByteString(bytes2))
+            ByteString(Await.result((fakeIoActor ? "random1"), Duration("1 second")).asInstanceOf[Option[Array[Byte]]].get) must_== ByteString(bytes1)
+            ByteString(Await.result((fakeIoActor ? "random2"), Duration("1 second")).asInstanceOf[Option[Array[Byte]]].get) must_== ByteString(bytes2)
         }
         "parse a result that comes in two chunks" in {
             val part1 = ByteString("VALUE parts 0 10")
             val part2 = ByteString("\r\nabcdefghij\r\nEND\r\n")
             iteratee(IO Chunk part1)
             iteratee(IO Chunk part2)
-            Await.result((fakeIoActor ? "parts"), Duration("1 second")).asInstanceOf[Option[ByteString]] must_== Some(ByteString("abcdefghij"))
+            ByteString(Await.result((fakeIoActor ? "parts"), Duration("1 second")).asInstanceOf[Option[Array[Byte]]].get) must_== ByteString("abcdefghij")
         }
         "make sure that it has the valid information in the state" in {
             val state = Await.result((fakeIoActor ? GiveMeTheState), Duration("1 second")).asInstanceOf[HashMap[String, Any]]
