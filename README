@@ -6,3 +6,26 @@ async, non-blocking memcached client using akka
 inspired by, but much simpler than, this project: https://github.com/derekjw/fyrie-redis
 
 info on akka io / iteratee library: http://doc.akka.io/docs/akka/2.0.3/scala/io.html
+
+
+Features
+--------
+ * Supports set, get, and delete instructions
+ * All instructions are non-blocking.
+ * Set and Delete instructions are fire-and-forget, get instructions return Akka Futures
+ * Uses consistent hashing to distribute data across multiple memcached servers
+ * Deduplicates keys: If two clients make a request for the same key, only one call to Memcached will be made
+
+
+
+How to build
+------------
+ * Requires sbt https://github.com/harrah/xsbt/wiki
+ * cd Into the akka-memcached directory and run `sbt package`
+ * The jar will be located in target/scala-2.9.1
+
+Usage
+-----
+ * Include this jar in your project
+ * Create a new instance of RealMemcachedClient
+ * When calling get or set on the client, it is necessary to have an implicit serializer within the scope

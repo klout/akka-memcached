@@ -24,6 +24,11 @@ class FakeIoActor extends Actor {
     }
 }
 
+/**
+ * This test verifies that the client understands the memcached protocol. It generates
+ * fake outputs from memcached and ensures that the protocol correctly parses the 
+ * result.
+ */
 class MemcachedClientSpec extends Specification {
     implicit val timeout = Timeout(Duration("30 seconds")) // needed for `?` below
     implicit val system = ActorSystem()
