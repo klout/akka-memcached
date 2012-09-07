@@ -1,18 +1,16 @@
 package test
 
-import org.specs2.execute.PendingUntilFixed
-import org.specs2.mutable._
-import akka.util.duration._
-import akka.util.Duration
 import akka.dispatch.Await
-import scala.reflect.BeanProperty
+import akka.util.Duration
+import akka.util.duration._
 import com.klout.akkamemcache._
+import org.specs2.mutable.Specification
 import Serialization.JBoss
 
-case class TestClass(@BeanProperty test1: String,
-                     @BeanProperty test2: Map[String, Int])
+case class TestClass(test1: String,
+                     test2: Map[String, Int])
 
-class MemcachedClientIntegrationSpec extends Specification with PendingUntilFixed {
+class MemcachedClientIntegrationSpec extends Specification {
 
     val client = new RealMemcachedClient(List(("localhost", 11211)), 1)
     val noTTL = Duration("0 seconds")

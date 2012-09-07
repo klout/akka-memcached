@@ -1,23 +1,20 @@
 package test
 
-import org.specs2.execute.PendingUntilFixed
-import org.specs2.mutable._
-import akka.util.duration._
-import akka.util.Duration
 import akka.actor._
-import akka.util.ByteString
 import akka.dispatch.Await
-import scala.reflect.BeanProperty
-import scala.collection.mutable.HashMap
-import com.klout.akkamemcache._
-import akka.util.Timeout
 import akka.pattern.ask
+import akka.util.{ ByteString, Duration, Timeout }
+import akka.util.duration._
+
+import com.klout.akkamemcache._
+import org.specs2.mutable.Specification
+import scala.collection.mutable.HashMap
 import scala.util.Random
 
 object GiveMeTheState // Command to give the state to the test
 
 class FakeIoActor extends Actor {
-    var state: HashMap[String, Any] = new HashMap()
+    val state: HashMap[String, Any] = new HashMap()
     def receive = {
         case Finished          => state += (("Finished" -> true))
         case GiveMeTheState    => sender ! state
@@ -27,7 +24,7 @@ class FakeIoActor extends Actor {
     }
 }
 
-class MemcachedClientSpec extends Specification with PendingUntilFixed {
+class MemcachedClientSpec extends Specification {
     implicit val timeout = Timeout(Duration("30 seconds")) // needed for `?` below
     implicit val system = ActorSystem()
     val fakeIoActor = system.actorOf(Props[FakeIoActor])

@@ -1,22 +1,27 @@
 package com.klout.akkamemcache
 
-import akka.actor._
-import akka.util.ByteString
-import java.net.InetSocketAddress
-import akka.dispatch.Future
-import com.klout.akkamemcache.Protocol._
-import scala.collection.mutable.{ HashMap, LinkedHashSet }
-import com.klout.akkamemcache.Protocol._
-import scala.collection.JavaConversions._
-import scala.util.Random
-import akka.routing._
 import ActorTypes._
-import com.google.common.hash.Hashing._
-import java.io._
-import akka.event.Logging
 
+import akka.actor._
+import akka.dispatch.Future
+import akka.event.Logging
+import akka.routing._
+import akka.util.ByteString
+import com.google.common.hash.Hashing._
+import com.klout.akkamemcache.Protocol._
+import com.klout.akkamemcache.Protocol._
+import java.io._
+import java.net.InetSocketAddress
+import java.net.URLEncoder._
+import scala.collection.JavaConversions._
+import scala.collection.mutable.{ HashMap, LinkedHashSet }
+import scala.util.Random
+
+/**
+ * These types are used to make the code more understandable.
+ */
 object ActorTypes {
-    type RequestorActorRef = ActorRef
+    type RequestingActorRef = ActorRef
     type IoActorRouterRef = ActorRef
     type PoolActorRef = ActorRef
 }
@@ -30,12 +35,12 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
     /**
      * Maps memcached servers to a pool of IOActors, one for each connection.
      */
-    val ioActorMap: HashMap[String, IoActorRouterRef] = new HashMap()
+    var ioActorMap: Map[String, IoActorRouterRef] = _
 
     /**
      * RequestMap maps the requesting actor to the results that will be recieved from memcached.
      */
-    val requestMap: HashMap[RequestorActorRef, HashMap[String, Option[GetResult]]] = new HashMap()
+    val requestMap: HashMap[RequestingActorRef, HashMap[String, Option[GetResult]]] = new HashMap()
 
     /**
      * Updates the requestMap to add the result from Memcached to any actor
@@ -78,19 +83,19 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
      * of actors. Each IoActor owns one connection to the server.
      */
     override def preStart {
-        ioActorMap ++=
+        ioActorMap =
             hosts.map {
                 case (host, port) =>
                     val ioActors = (1 to connectionsPerServer).map {
                         num =>
                             context.actorOf(Props(new MemcachedIOActor(host, port, self)),
-                                name = "Memcached_IO_Actor_for_" + host + "_" + num)
+                                name = encode("Memcached IoActor for " + host + " " + num))
                     }.toList
-                    val router = context.actorOf(Props(new MemcachedIOActor(host, port, self)).withRouter(RoundRobinRouter(routees = ioActors)),
-                        name = "Memcached_IO_Actor_Router_for_" + host)
-                    (host, router)
-
-            }
+                    val router = RoundRobinRouter(routees = ioActors)
+                    val routingActor = context.actorOf(Props(new MemcachedIOActor(host, port, self)) withRouter router,
+                        name = encode("Memcached IoActor Router for " + host))
+                    host -> routingActor
+            } toMap
     }
 
     /**
@@ -258,6 +263,10 @@ class MemcachedIOActor(host: String, port: Int, poolActor: PoolActorRef) extends
      */
     val iteratee = IO.IterateeRef.async(new Iteratees(self).processInput)(context.dispatcher)
 
+    /**
+     * If this actor is awaiting a response from Memcached, then it will not
+     * make any requests until the response is returned
+     */
     var awaitingResponseFromMemcached = false
 
     def receive = {
@@ -313,6 +322,10 @@ sealed trait GetResult {
     def key: String
 }
 
+/**
+ * Contains a set of GetResults. This case class is necessary to compensate
+ * for JVM type erasure
+ */
 case class GetResults(results: Set[GetResult])
 
 /**

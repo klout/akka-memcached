@@ -8,6 +8,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import akka.util.ByteString
 import java.util.Calendar
+import java.net.URLEncoder._
 
 import com.klout.akkamemcache.Protocol._
 
@@ -41,12 +42,12 @@ trait MemcachedClient {
     /**
      * Retrieves the value of a single key
      */
-    def get[T: Deserializer](key: String): Future[Option[T]]
+    def get[T: Serializer](key: String): Future[Option[T]]
 
     /**
      * Retrieves the values of multiple keys
      */
-    def mget[T: Deserializer](keys: Set[String]): Future[Map[String, T]]
+    def mget[T: Serializer](keys: Set[String]): Future[Map[String, T]]
 
     /**
      * Deletes multiple keys - Fire and Forget
@@ -56,11 +57,16 @@ trait MemcachedClient {
 }
 
 class RealMemcachedClient(hosts: List[(String, Int)], connectionsPerServer: Int = 1) extends MemcachedClient {
-    implicit val timeout = Timeout(60 seconds) // needed for `?` below
+
+    /**
+     * Maximum amount of time the client will wait for a response from
+     * a get instruction from Memcached
+     */
+    implicit val timeout = Timeout(60 seconds)
 
     val system = ActorSystem()
 
-    val poolActor = system.actorOf(Props(new PoolActor(hosts, connectionsPerServer)), name = "PoolActor")
+    val poolActor = system.actorOf(Props(new PoolActor(hosts, connectionsPerServer)), name = encode("Pool Actor"))
 
     override def set[T: Serializer](key: String, value: T, ttl: Duration) {
         mset(Map(key -> value), ttl)
@@ -73,17 +79,17 @@ class RealMemcachedClient(hosts: List[(String, Int)], connectionsPerServer: Int 
         poolActor ! SetCommand(serializedKeyValueMap, ttl.toSeconds)
     }
 
-    override def get[T: Deserializer](key: String): Future[Option[T]] = {
+    override def get[T: Serializer](key: String): Future[Option[T]] = {
         mget(Set(key)).map(_.get(key))
     }
 
-    override def mget[T: Deserializer](keys: Set[String]): Future[Map[String, T]] = {
+    override def mget[T: Serializer](keys: Set[String]): Future[Map[String, T]] = {
         time("mget"){
             val command = GetCommand(keys)
             (poolActor ? command).map{
                 case result: List[GetResult] => {
                     result.flatMap {
-                        case Found(key, value) => Some((key, Deserializer.deserialize[T](value)))
+                        case Found(key, value) => Some((key, Serializer.deserialize[T](value)))
                         case NotFound(key)     => None
                     }
                 }.toMap

@@ -8,12 +8,22 @@ import java.io.Closeable
 import java.io.IOException
 import java.util.Calendar
 import scala.collection.JavaConversions._
-import org.apache.avro.util.ByteBufferInputStream
 
+/**
+ * This object contains serializers that can be used by the Memcached client
+ * to serialize and deserialize data.
+ */
 object Serialization {
 
-    implicit def JBoss[T <: Any] = new SerializerWithDeserializer[T] {
+    /**
+     * Import this serializer to use JBoss serialization with Memcached
+     */
+    implicit def JBoss[T <: Any] = new Serializer[T] {
 
+        /**
+         * Uses a connection or stream to compute a result, and closes
+         * the connection once the result is computed
+         */
         def using[C <: Closeable, V](closeables: C*)(f: () => V): V = {
             try {
                 f.apply
@@ -22,6 +32,9 @@ object Serialization {
             }
         }
 
+        /**
+         * Swallows any exception
+         */
         def safely(f: => Any) {
             try { f } catch { case error => {} }
         }
@@ -41,13 +54,10 @@ object Serialization {
                         ByteString(byteArray)
                     } catch {
                         case e: IOException => throw new IllegalArgumentException("Non-serializable object", e);
-                        case other => {
-                            println("Error: " + other)
-                            throw other
-                        }
                     }
             }
         }
+
         def deserialize(in: Array[Byte]): T = time("deserialize"){
             val bis = time("Create ByteArrayInputStream"){
                 new ByteArrayInputStream(in)
@@ -65,20 +75,28 @@ object Serialization {
     }
 }
 
-trait Serializer[T] {
-    def serialize(t: T): ByteString
-}
-
+/**
+ * Helper object used by RealMemcachedClient for serialization. Requires an implicit
+ * serializer within it's scope
+ */
 object Serializer {
     def serialize[T: Serializer](t: T): ByteString = implicitly[Serializer[T]] serialize t
+    def deserialize[T: Serializer](bytes: Array[Byte]): T = implicitly[Serializer[T]] deserialize bytes
 }
 
-trait Deserializer[T] {
+/**
+ * You can define your own serializer by mixing in this trait
+ */
+trait Serializer[T] {
+
+    /**
+     * Converts an object of type T into an akka.util.ByteString for storage
+     * into Memcached.
+     */
+    def serialize(t: T): ByteString
+
+    /**
+     * Converts a bytearray from Memcached into an object of type T
+     */
     def deserialize(bytes: Array[Byte]): T
 }
-
-object Deserializer {
-    def deserialize[T: Deserializer](bytes: Array[Byte]): T = implicitly[Deserializer[T]] deserialize bytes
-}
-
-trait SerializerWithDeserializer[T] extends Serializer[T] with Deserializer[T]
