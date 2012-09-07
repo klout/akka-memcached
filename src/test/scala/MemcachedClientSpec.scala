@@ -11,7 +11,7 @@ import org.specs2.mutable.Specification
 import scala.collection.mutable.HashMap
 import scala.util.Random
 
-object GiveMeTheState // Command to give the state to the test
+object GiveMeTheState 
 
 class FakeIoActor extends Actor {
     val state: HashMap[String, Any] = new HashMap()

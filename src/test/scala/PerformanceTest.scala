@@ -43,7 +43,7 @@ class JbossSerializingTranscoder extends SerializingTranscoder {
         }
     }
 
-    override def deserialize(in: Array[Byte]): AnyRef = time("spy deserialize"){
+    override def deserialize(in: Array[Byte]): AnyRef = {
         Option(in) match {
             case Some(in) =>
                 try {

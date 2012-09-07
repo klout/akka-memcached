@@ -42,12 +42,11 @@ class Iteratees(ioActor: ActorRef) {
             /**
              * The cached values from a multiget have been returned
              */
-            case End => {
+            case End =>
                 IO takeUntil CRLF map { _ =>
                     ioActor ! Finished
                     None
                 }
-            }
 
             case Error => IO takeUntil CRLF map (_ => None)
 
@@ -88,16 +87,21 @@ class Iteratees(ioActor: ActorRef) {
                 case Chunk(byteString) =>
                     val bytes = byteString.toArray
                     val numToCopy = min(total - current, bytes.size)
+
                     Array.copy(bytes, 0, array, current, numToCopy)
+
                     val chunk = if (numToCopy == bytes.size) {
                         Chunk.empty
                     } else {
                         Chunk(byteString drop numToCopy)
                     }
+
                     if (total == current + numToCopy) (Done(array), chunk)
+
                     else {
                         (Cont(continue(array, total, current + numToCopy)), chunk)
                     }
+
                 case EOF(cause) => throw new Exception("EOF") //(Failure(new EOFException("Unexpected EOF")), EOF)
                 case _          => throw new Exception("Something else")
             }
@@ -173,7 +177,7 @@ object Protocol {
          * set <key> <flags> <exptime> <bytes> [noreply]\r\n
          */
         override def toByteString = {
-            val instructions = keyValueMap.map {
+            val instructions = keyValueMap map {
                 case (key, value) =>
                     if (key.isEmpty) throw new RuntimeException("An empty string is not a valid key")
                     if (!(key intersect whitespace).isEmpty) throw new RuntimeException("Keys cannot have whitespace")
@@ -199,7 +203,7 @@ object Protocol {
          * delete <key> [noreply]\r\n
          */
         override def toByteString = {
-            val instructions = keys.map {
+            val instructions = keys map {
                 /* Single delete instruction */
                 "delete " + _ + " noreply" + CRLFString
             }
