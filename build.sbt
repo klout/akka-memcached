@@ -3,8 +3,7 @@ import scalariform.formatter.preferences._
 
 name := "akka-memcached"
 
-version := "0.9"
-
+version := "0.1"
 
 scalaVersion := "2.9.1"
 
@@ -30,6 +29,8 @@ organization := "com.klout"
 publishTo := Some("kloutLibraryReleases" at "http://maven-repo:8081/artifactory/libs-release-local")
 
 credentials := Credentials(Path.userHome / ".ivy2" / ".credentials") :: Nil
+
+scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 scalariformSettings ++ Seq(
     ScalariformKeys.preferences := FormattingPreferences().

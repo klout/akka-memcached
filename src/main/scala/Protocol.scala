@@ -1,4 +1,4 @@
-package com.klout.akkamemcache
+package com.klout.akkamemcached
 
 import akka.util.ByteString
 import akka.actor._
@@ -157,7 +157,7 @@ object Protocol {
     /**
      * This trait is for a command that the MemcachedClient will send to Memcached via an IoActor
      */
-    trait Command {
+    sealed trait Command {
         /**
          * Renders a ByteString that can be directly written to the connection
          * to a Memcached server
@@ -228,5 +228,9 @@ object Protocol {
             else ByteString()
         }
     }
+
+    sealed trait Response
+
+    case class GetResponse(resuts: Iterable[GetResult])
 
 }

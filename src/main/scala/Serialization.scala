@@ -1,4 +1,4 @@
-package com.klout.akkamemcache
+package com.klout.akkamemcached
 
 import akka.util.ByteString
 import org.jboss.serial.io._

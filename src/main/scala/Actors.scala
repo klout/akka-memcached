@@ -1,4 +1,4 @@
-package com.klout.akkamemcache
+package com.klout.akkamemcached
 
 import ActorTypes._
 
@@ -8,8 +8,7 @@ import akka.event.Logging
 import akka.routing._
 import akka.util.ByteString
 import com.google.common.hash.Hashing._
-import com.klout.akkamemcache.Protocol._
-import com.klout.akkamemcache.Protocol._
+import com.klout.akkamemcached.Protocol._
 import java.io._
 import java.net.InetSocketAddress
 import java.net.URLEncoder._
@@ -71,7 +70,7 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
         }
         responsesToSend foreach {
             case (actor, responses) =>
-                actor ! responses.values.flatten
+                actor ! GetResponse(responses.values.flatten)
                 requestMap -= actor
         }
     }
@@ -87,11 +86,11 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
                     val ioActors = (1 to connectionsPerServer).map {
                         num =>
                             context.actorOf(Props(new MemcachedIOActor(host, port, self)),
-                                name = encode("Memcached IoActor for " + host + " " + num))
+                                name = encode("Memcached IoActor for " + host + " " + num, "UTF-8"))
                     }.toList
                     val router = RoundRobinRouter(routees = ioActors)
                     val routingActor = context.actorOf(Props(new MemcachedIOActor(host, port, self)) withRouter router,
-                        name = encode("Memcached IoActor Router for " + host))
+                        name = encode("Memcached IoActor Router for " + host, "UTF-8"))
                     host -> routingActor
             } toMap
     }
@@ -143,7 +142,8 @@ class PoolActor(hosts: List[(String, Int)], connectionsPerServer: Int) extends A
             forwardCommand(command)
 
         /* Route a SetCommand or DeleteCommand to the correct IoActor */
-        case command: Command => forwardCommand(command)
+        case command: Command =>
+            forwardCommand(command)
 
         /**
          * Update the requestMap for any actors that were requesting this result, and

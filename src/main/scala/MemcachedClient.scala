@@ -1,4 +1,4 @@
-package com.klout.akkamemcache
+package com.klout.akkamemcached
 
 import akka.dispatch.Future
 import akka.actor._
@@ -10,7 +10,7 @@ import akka.util.ByteString
 import java.util.Calendar
 import java.net.URLEncoder._
 
-import com.klout.akkamemcache.Protocol._
+import com.klout.akkamemcached.Protocol._
 
 /**
  * Asynchronous memcached client.
@@ -60,7 +60,7 @@ class RealMemcachedClient(hosts: List[(String, Int)], connectionsPerServer: Int 
 
     val system = ActorSystem()
 
-    val poolActor = system.actorOf(Props(new PoolActor(hosts, connectionsPerServer)), name = encode("Pool Actor"))
+    val poolActor = system.actorOf(Props(new PoolActor(hosts, connectionsPerServer)), name = encode("Pool Actor", "UTF-8"))
 
     override def set[T: Serializer](key: String, value: T, ttl: Duration) {
         mset(Map(key -> value), ttl)
@@ -80,8 +80,8 @@ class RealMemcachedClient(hosts: List[(String, Int)], connectionsPerServer: Int 
     override def mget[T: Serializer](keys: Set[String]): Future[Map[String, T]] = {
         val command = GetCommand(keys)
         (poolActor ? command).map{
-            case result: List[GetResult] => {
-                result.flatMap {
+            case GetResponse(results) => {
+                results.flatMap {
                     case Found(key, value) => Some((key, Serializer.deserialize[T](value)))
                     case NotFound(key)     => None
                 }

@@ -35,8 +35,8 @@ Example
 	import akka.util.duration._
 	import akka.util.Timeout
 	import akka.dispatch.Await
-	import com.klout.akkamemcache.RealMemcachedClient
-	import com.klout.akkamemcache.Serialization.JBoss
+	import com.klout.akkamemcached.RealMemcachedClient
+	import com.klout.akkamemcached.Serialization.JBoss
 
 	object Test {
 		// Create a client that connects to localhost on a single connection

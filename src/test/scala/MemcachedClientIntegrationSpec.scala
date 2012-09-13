@@ -3,13 +3,12 @@ package test
 import akka.dispatch.Await
 import akka.util.Duration
 import akka.util.duration._
-import com.klout.akkamemcache._
+import com.klout.akkamemcached._
 import org.specs2.mutable.Specification
 import Serialization.JBoss
 
 case class TestClass(test1: String,
                      test2: Map[String, Int])
-
 
 /**
  * This tests that set, get, and delete funciton properly on a local memcached conneciton.
